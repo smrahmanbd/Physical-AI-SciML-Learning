@@ -1,0 +1,98 @@
+{
+ "1.1": [
+  "Physics and data, side by side",
+  "Measurements stop at the dashed line. A pure data fit (brown) leaves the truth; a physics model (blue) keeps following it. SciML uses both."
+ ],
+ "1.2": [
+  "Euler's method, one step at a time",
+  "Each dot follows the slope for one time step. With Δt = 1 s the steps fall below the exact decay (dashed): smaller steps follow it more closely."
+ ],
+ "1.3": [
+  "Signals flowing through a small network",
+  "An input passes to hidden neurons, each a soft step tanh(w·x + b); the output adds them with weights. Training adjusts the weights."
+ ],
+ "1.4": [
+  "Gradient descent with momentum",
+  "The ball steps downhill along the loss; momentum lets it roll past the shallow valley into the deeper one."
+ ],
+ "1.5": [
+  "Physics fills the gap after the data",
+  "Six measurements in the first second. Without physics the curve wanders; checking the law at collocation points (ticks) locks it onto the true decay."
+ ],
+ "1.6": [
+  "From underfitting to overfitting",
+  "The same noisy points fitted by a line (misses the wave), a smooth curve (about right) and a wiggly curve through every point (fits the noise)."
+ ],
+ "1.7": [
+  "A slow model and its fast surrogate",
+  "A slow simulator produces a few runs; a surrogate (green) stretches smoothly through them and then answers new questions almost instantly."
+ ],
+ "1.8": [
+  "The Physical AI loop",
+  "Left: the loop runs again and again: sense, estimate, decide, act. Right: noisy GPS readings (brown) around a car; the Kalman estimate (blue) follows it smoothly."
+ ],
+ "2.1": [
+  "A SciML project, step by step",
+  "Seven steps from question to shared code, and a time-ordered split: train on the past, validate later, test last."
+ ],
+ "2.2": [
+  "Training a PINN: both losses fall",
+  "The network feeds a data loss and a physics loss; both shrink during training while the unknown decay rate k is learned."
+ ],
+ "2.3": [
+  "Heat diffusing on a grid",
+  "A temperature profile on grid points smooths and fades as heat flows to the cold ends; the fine ripple disappears first."
+ ],
+ "2.4": [
+  "SINDy keeps only the terms that matter",
+  "Seven candidate terms are fitted; the small ones fade away, leaving the law dv/dt = −4x − 0.3v."
+ ],
+ "2.5": [
+  "A neural operator maps functions to functions",
+  "Each new input function (left) is read by the branch net; the trunk net reads the location; their product gives the whole solution (right) at once."
+ ],
+ "2.6": [
+  "A Gaussian process and its uncertainty",
+  "Observations pin the mean curve; the shaded 95% band is narrow near data and widens in the gaps."
+ ],
+ "2.7": [
+  "Hybrid modelling beyond the data",
+  "A straight physics line (dashed), plus a small learned correction (green), follows the true curve far beyond the data; pure ML (brown) does not."
+ ],
+ "2.8": [
+  "Conformal intervals: right on average",
+  "A constant ± band calibrated on held-out errors covers about 90% of new points overall, but misses more where the noise is larger."
+ ],
+ "3.1": [
+  "A jam travelling between detectors",
+  "Density along a road: the dark band is a jam moving against the traffic. Two detectors see it only when it passes them; the physics fills the gap."
+ ],
+ "3.2": [
+  "A braking wave along a platoon",
+  "The red leader brakes; brake lights flash one car after another down the line. Whether the wave grows or fades depends on reaction and control."
+ ],
+ "3.3": [
+  "Time to collision counts down",
+  "A faster car closes on a slower one; the time to collision falls until it brakes. Values below about 1.5 s are serious conflicts."
+ ],
+ "3.4": [
+  "Climbing costs energy",
+  "A car climbing a grade must lift its weight as well as overcome inertia, tyres and air; the road-load equation turns this into energy and CO₂."
+ ],
+ "3.5": [
+  "Emulating GCAM",
+  "The integrated assessment model is run at a few carbon prices; an emulator (green) through those runs answers thousands of policy questions quickly."
+ ],
+ "3.6": [
+  "Crowding slows everyone down",
+  "As the crowd packs together (left), walking speed falls along Weidmann's physics-shaped curve (right), reaching zero at jam density."
+ ],
+ "3.7": [
+  "A digital twin stays in step",
+  "Live detector data flow from the real junction to its twin, keeping the twin's queue in step; actions tested in the twin flow back."
+ ],
+ "3.8": [
+  "Signposts to the research frontier",
+  "Five open fronts: foundation models, world models, verification of learned control, rare events, and fairness and transfer."
+ ]
+}
