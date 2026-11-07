@@ -1,0 +1,323 @@
+{
+ "id": "1.5",
+ "go": 1,
+ "slug": "physics-informed-learning",
+ "title": "Physics-informed learning: the core idea",
+ "minutes": 40,
+ "tag": "Core idea",
+ "systems": [
+  "physics",
+  "learn"
+ ],
+ "summary": "A physics-informed model is trained to fit the data and to obey a known equation at many points. The physics fills the gaps between and beyond measurements, so far fewer data are needed.",
+ "outcomes": [
+  "write a physics-informed loss with a data term and a residual term",
+  "explain what collocation points are and why they help",
+  "show how the physics weight changes predictions beyond the data",
+  "name the main strengths and weaknesses of physics-informed neural networks"
+ ],
+ "narration_en": "This is the central idea of the course. Suppose we know the law that governs a system, say that a quantity decays as dy over dt equals minus k y, but we have only a few noisy measurements, all from the first second. A plain network fitted to those points can do anything afterwards. A physics-informed model adds a second term to the loss: at many chosen times, called collocation points, it checks how badly the model breaks the equation, and penalises that. The model must now fit the data and obey the law. Because collocation points cost nothing, we can place them everywhere, including where we have no data, and the physics fills the gap. This is the idea behind physics-informed neural networks, or PINNs, introduced by Raissi, Perdikaris and Karniadakis in 2019. The balance between the two loss terms matters: too little physics and the model wanders; too much and it ignores the data. In this module you will turn the physics weight up and down and watch the prediction lock onto the law.",
+ "narration_ar": "هذه هي الفكرة المحورية في المقرر. لنفترض أننا نعرف القانون الذي يحكم نظاماً ما، مثلاً أن كمية تتحلل وفق القاعدة: معدل تغير y يساوي سالب k مضروباً في y، لكن لدينا قياسات قليلة مشوشة، كلها من الثانية الأولى. الشبكة العادية المدرّبة على هذه النقاط قد تفعل أي شيء بعدها. أما النموذج المستنير بالفيزياء فيضيف حداً ثانياً إلى دالة الخسارة: عند أزمنة كثيرة مختارة تسمى نقاط التجميع، يقيس مقدار مخالفة النموذج للمعادلة ويعاقب عليها. فيجب على النموذج الآن أن يطابق البيانات ويطيع القانون معاً. ولأن نقاط التجميع لا تكلف شيئاً، يمكننا وضعها في كل مكان، حتى حيث لا توجد بيانات، فتملأ الفيزياء الفراغ. هذه هي فكرة الشبكات العصبية المستنيرة بالفيزياء التي قدّمها رايسي وبيرديكاريس وكارنياداكيس عام 2019. والتوازن بين حدّي الخسارة مهم: فيزياء قليلة جداً تجعل النموذج يتيه، وفيزياء كثيرة جداً تجعله يتجاهل البيانات. ستغيّر في هذه الوحدة وزن الفيزياء صعوداً وهبوطاً وتشاهد التنبؤ يلتزم بالقانون.",
+ "diagram": {
+  "title": "A physics-informed loss",
+  "caption": "The model is pulled towards the data at measurement points and towards the law at collocation points.",
+  "nodes": [
+   {
+    "id": "net",
+    "label": "Model ŷ(t)",
+    "sub": "network or basis",
+    "x": 140,
+    "y": 220,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Any flexible function of time: a neural network, or (in the explorer) a sum of smooth bumps."
+   },
+   {
+    "id": "dat",
+    "label": "Data term",
+    "sub": "Σ (ŷ − y)² at measurements",
+    "x": 450,
+    "y": 90,
+    "w": 210,
+    "h": 64,
+    "sys": "data",
+    "detail": "How far the model is from the few measurements we have."
+   },
+   {
+    "id": "res",
+    "label": "Physics residual",
+    "sub": "dŷ/dt + k ŷ at collocation pts",
+    "x": 450,
+    "y": 250,
+    "w": 230,
+    "h": 64,
+    "sys": "physics",
+    "detail": "How badly the model breaks the law. Computed by automatic differentiation; zero if the law is obeyed exactly."
+   },
+   {
+    "id": "col",
+    "label": "Collocation points",
+    "sub": "free: anywhere we like",
+    "x": 450,
+    "y": 420,
+    "w": 200,
+    "h": 64,
+    "sys": "physics",
+    "detail": "Times (or places) where we check the law. No measurement needed, so we can place them beyond the data."
+   },
+   {
+    "id": "tot",
+    "label": "Total loss",
+    "sub": "data + λ × physics",
+    "x": 760,
+    "y": 170,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "λ, the physics weight, balances the two terms."
+   },
+   {
+    "id": "pred",
+    "label": "Prediction",
+    "sub": "fits data, obeys law",
+    "x": 760,
+    "y": 380,
+    "w": 170,
+    "h": 64,
+    "sys": "system",
+    "detail": "Accurate where we measured and sensible where we did not."
+   }
+  ],
+  "edges": [
+   {
+    "from": "net",
+    "to": "dat",
+    "label": ""
+   },
+   {
+    "from": "net",
+    "to": "res",
+    "label": ""
+   },
+   {
+    "from": "col",
+    "to": "res",
+    "label": "where to check"
+   },
+   {
+    "from": "dat",
+    "to": "tot",
+    "label": ""
+   },
+   {
+    "from": "res",
+    "to": "tot",
+    "label": "× λ"
+   },
+   {
+    "from": "tot",
+    "to": "pred",
+    "label": "minimise"
+   }
+  ],
+  "tour": [
+   {
+    "focus": [
+     "net",
+     "dat"
+    ],
+    "text": "As usual, the model is compared with the data.",
+    "edges": [
+     [
+      "net",
+      "dat"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "res",
+     "col"
+    ],
+    "text": "New: at collocation points, we check how badly it breaks the law.",
+    "edges": [
+     [
+      "net",
+      "res"
+     ],
+     [
+      "col",
+      "res"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "tot"
+    ],
+    "text": "The total loss adds both, with a physics weight λ.",
+    "edges": [
+     [
+      "dat",
+      "tot"
+     ],
+     [
+      "res",
+      "tot"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "pred"
+    ],
+    "text": "Minimising it gives a model that fits the data and obeys the physics.",
+    "edges": [
+     [
+      "tot",
+      "pred"
+     ]
+    ]
+   }
+  ]
+ },
+ "sections": [
+  {
+   "heading": "Two terms in the loss",
+   "html": "<p>For the law dy/dt = −k y, a physics-informed loss is</p><div class=\"eq\">L = (1/N<sub>d</sub>) Σ (ŷ(tᵢ) − yᵢ)² + λ (1/N<sub>c</sub>) Σ (dŷ/dt(t<sub>c</sub>) + k ŷ(t<sub>c</sub>))²</div><p>The first term fits N<sub>d</sub> measurements; the second checks the law at N<sub>c</sub> collocation points. Initial or boundary conditions can be added as extra data-like terms.</p>"
+  },
+  {
+   "heading": "Why it needs fewer data",
+   "html": "<p>In the explorer, six measurements from 0 to 1 s alone leave the model free to do anything from 1 to 5 s (error about 1.6). Add 20 collocation points with λ = 1 and the error beyond the data falls to about 0.02: the law has replaced the missing measurements. With only 3 collocation points the gaps between them are unconstrained again (error about 0.8).</p>"
+  },
+  {
+   "heading": "Balancing the terms",
+   "html": "<p>If λ is tiny, the physics is ignored. If λ is huge, the optimiser satisfies the law but may drift from the data (in the explorer, λ = 100 raises the error to about 0.17, because the noisy data and the initial value are underweighted). In practice the terms are scaled, or adaptive weighting schemes are used (Wang, Teng and Perdikaris 2021).</p>"
+  },
+  {
+   "heading": "Strengths and limits of PINNs",
+   "html": "<p><b>Strengths</b>: work with sparse, noisy data; no mesh needed; can solve <i>inverse problems</i> (find unknown parameters such as k from data). <b>Limits</b>: training can be slow and fragile, especially for sharp fronts such as shock waves; for simple forward problems classical solvers are usually faster and more accurate. PINNs shine when data and physics must be combined.</p>"
+  }
+ ],
+ "callouts": [
+  {
+   "after": 1,
+   "kind": "try",
+   "title": "Try it",
+   "html": "<p>Start at λ = 10⁻⁴, then step it up. At what value does the prediction beyond the data snap onto the true curve?</p>"
+  },
+  {
+   "after": 3,
+   "kind": "research",
+   "title": "Research angle",
+   "html": "<p>Physics-informed deep learning for traffic (Shi et al. 2021) and for crowds builds on exactly this loss. You will apply it in Go 3.</p>"
+  }
+ ],
+ "explorer": {
+  "widget": "pinn",
+  "intro": "Six noisy measurements in the first second. The law dy/dt = −0.8 y is known. Choose how much to trust it.",
+  "predict": "With the physics weight near zero, what will the model do after t = 1?"
+ },
+ "code": [
+  {
+   "title": "A physics-informed fit with least squares",
+   "lang": "python",
+   "runnable": true,
+   "source": "import numpy as np\nrng = np.random.default_rng(21)\nk, c, w = 0.8, np.linspace(0, 5, 14), 0.5\nphi  = lambda t: np.c_[np.ones_like(t), np.exp(-((t[:, None] - c)/w)**2)]\ndphi = lambda t: np.c_[np.zeros_like(t), -2*(t[:, None] - c)/w**2*np.exp(-((t[:, None] - c)/w)**2)]\ntd = np.linspace(0, 1, 6); yd = np.exp(-k*td) + 0.02*rng.standard_normal(6)\ntc = np.linspace(0, 5, 20)\nt_new = np.linspace(1, 5, 50)\nfor lam in [1e-4, 1.0]:\n    A = np.vstack([phi(td), np.sqrt(lam)*(dphi(tc) + k*phi(tc))])\n    b = np.r_[yd, np.zeros(20)]\n    wts = np.linalg.solve(A.T @ A + 1e-6*np.eye(15), A.T @ b)\n    err = np.sqrt(np.mean((phi(t_new) @ wts - np.exp(-k*t_new))**2))\n    print(f'physics weight {lam:g}: error beyond the data {err:.3f}')",
+   "explain": "The same data, two physics weights. Because the model is linear in its weights, the loss is minimised exactly.",
+   "expected": "physics weight 0.0001: error beyond the data 0.154\nphysics weight 1: error beyond the data 0.020"
+  }
+ ],
+ "takeaways": [
+  "A physics-informed loss adds a penalty for breaking the governing equation.",
+  "Collocation points are free, so physics can fill gaps where there are no data.",
+  "The physics weight λ must balance data and law.",
+  "PINNs suit sparse data and inverse problems; classical solvers are better for simple forward problems."
+ ],
+ "quiz": [
+  {
+   "q": "A collocation point is where…",
+   "options": [
+    "A measurement was taken",
+    "The model is checked against the governing equation",
+    "Training stops",
+    "The network has a neuron"
+   ],
+   "answer": 1,
+   "explain": "No measurement needed."
+  },
+  {
+   "q": "Why can physics-informed models work with few data?",
+   "options": [
+    "They ignore data",
+    "The equation constrains the model where there are no data",
+    "They use bigger networks",
+    "They need no training"
+   ],
+   "answer": 1,
+   "explain": "Physics fills gaps."
+  },
+  {
+   "q": "What happens with a very large physics weight?",
+   "options": [
+    "Perfect fit to data",
+    "The law is obeyed but the data may be underweighted",
+    "Training becomes instant",
+    "Nothing"
+   ],
+   "answer": 1,
+   "explain": "Balance matters."
+  },
+  {
+   "q": "An inverse problem means…",
+   "options": [
+    "Solving backwards in time",
+    "Finding unknown parameters of the equation from data",
+    "Reversing the network",
+    "Using negative data"
+   ],
+   "answer": 1,
+   "explain": "For example finding k."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Physics-informed neural network (PINN)",
+   "def": "A neural network trained with a loss that includes the residual of a governing equation."
+  },
+  {
+   "term": "Residual",
+   "def": "How much a candidate solution fails to satisfy an equation."
+  },
+  {
+   "term": "Collocation point",
+   "def": "A point where the equation residual is evaluated during training."
+  },
+  {
+   "term": "Physics weight",
+   "def": "The factor λ that balances the physics term against the data term."
+  },
+  {
+   "term": "Inverse problem",
+   "def": "Inferring unknown parameters or inputs of a model from observations."
+  }
+ ],
+ "resources": [
+  {
+   "title": "Raissi, Perdikaris and Karniadakis (2019): Physics-informed neural networks",
+   "url": "https://doi.org/10.1016/j.jcp.2018.10.045",
+   "why": "The paper that launched PINNs."
+  },
+  {
+   "title": "Ben Moseley: So, what is a physics-informed neural network?",
+   "url": "https://benmoseley.blog/my-research/so-what-is-a-physics-informed-neural-network/",
+   "why": "A clear blog post with code."
+  },
+  {
+   "title": "Wang, Teng and Perdikaris (2021): Gradient pathologies in PINNs",
+   "url": "https://doi.org/10.1137/20M1318043",
+   "why": "Why balancing the loss matters."
+  }
+ ]
+}

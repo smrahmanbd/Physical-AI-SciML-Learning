@@ -1,0 +1,336 @@
+{
+ "id": "2.3",
+ "go": 2,
+ "slug": "solving-pdes",
+ "title": "Solving PDEs: classical solvers and PINNs",
+ "minutes": 50,
+ "tag": "Build",
+ "systems": [
+  "physics",
+  "system"
+ ],
+ "summary": "Partial differential equations are solved on grids by finite differences or volumes, with stability limits on the time step. PINNs solve them without grids. Learn both, and when each wins.",
+ "outcomes": [
+  "discretise the heat equation with finite differences",
+  "explain and check the stability condition r ≤ 0.5",
+  "set up a PINN for a PDE with boundary and initial conditions",
+  "compare classical solvers and PINNs fairly"
+ ],
+ "narration_en": "Many systems vary in space as well as time: temperature in a pavement, pollution along a street, traffic density along a road. They obey partial differential equations. The classical way to solve them is to cut space and time into a grid. For the heat equation, the rate of change at a point is proportional to how much its neighbours differ from it, so each step updates every grid point from its neighbours. This explicit finite-difference scheme is simple, but it has a stability limit: the number r, the diffusivity times the time step divided by the square of the grid spacing, must stay at or below one half. Cross it and small wiggles grow until the solution explodes. For traffic, conservation laws are solved with finite-volume schemes such as Godunov's. A PINN takes a different route: it needs no grid, only collocation points in space and time, plus boundary and initial conditions in the loss. For simple forward problems a classical solver is usually faster and more accurate, but PINNs handle odd geometries, missing information and inverse problems. In this module you will push a solver past its stability limit.",
+ "narration_ar": "كثير من الأنظمة تتغير في المكان كما تتغير في الزمن: درجة الحرارة في رصف الطريق، والتلوث على امتداد شارع، وكثافة المرور على طول طريق. وهي تخضع لمعادلات تفاضلية جزئية. والطريقة الكلاسيكية لحلها هي تقطيع المكان والزمان إلى شبكة. ففي معادلة الحرارة يتناسب معدل التغير عند نقطة مع مقدار اختلاف جيرانها عنها، فتُحدَّث كل نقطة في الشبكة في كل خطوة انطلاقاً من جيرانها. هذا المخطط الصريح للفروق المحدودة بسيط، لكن له حد استقرار: العدد r، وهو معامل الانتشار مضروباً في الخطوة الزمنية مقسوماً على مربع تباعد الشبكة، يجب أن يبقى عند النصف أو دونه. فإذا تجاوزه نمت التموجات الصغيرة حتى ينفجر الحل. وفي المرور تُحل قوانين الحفظ بمخططات الحجوم المحدودة مثل مخطط غودونوف. أما الشبكة المستنيرة بالفيزياء فتسلك طريقاً آخر: لا تحتاج إلى شبكة، بل إلى نقاط تجميع في المكان والزمان، إضافة إلى الشروط الحدية والابتدائية في دالة الخسارة. وفي المسائل الأمامية البسيطة يكون الحل الكلاسيكي عادة أسرع وأدق، لكن الشبكات المستنيرة تتعامل مع الأشكال الهندسية الغريبة والمعلومات الناقصة والمسائل العكسية. ستدفع في هذه الوحدة مُحلاً إلى ما بعد حد استقراره.",
+ "diagram": {
+  "title": "Two ways to solve a PDE",
+  "caption": "A grid-based solver marches in time under a stability limit; a PINN minimises residuals at scattered points.",
+  "nodes": [
+   {
+    "id": "pde",
+    "label": "PDE + conditions",
+    "sub": "∂u/∂t = α ∂²u/∂x²",
+    "x": 450,
+    "y": 80,
+    "w": 200,
+    "h": 64,
+    "sys": "physics",
+    "detail": "The equation plus boundary conditions (ends held at zero) and an initial condition (starting temperature profile)."
+   },
+   {
+    "id": "grid",
+    "label": "Grid",
+    "sub": "Δx, Δt",
+    "x": 140,
+    "y": 220,
+    "w": 170,
+    "h": 64,
+    "sys": "system",
+    "detail": "Space cut into points Δx apart; time into steps Δt."
+   },
+   {
+    "id": "fd",
+    "label": "Finite differences",
+    "sub": "update from neighbours",
+    "x": 140,
+    "y": 400,
+    "w": 170,
+    "h": 64,
+    "sys": "physics",
+    "detail": "u_i ← u_i + r (u_{i+1} − 2u_i + u_{i−1}), r = αΔt/Δx²."
+   },
+   {
+    "id": "stab",
+    "label": "Stability",
+    "sub": "r ≤ 0.5",
+    "x": 450,
+    "y": 400,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "Explicit schemes blow up if r > 0.5. Implicit schemes are stable but need a linear solve each step."
+   },
+   {
+    "id": "pinn",
+    "label": "PINN",
+    "sub": "no grid, residual loss",
+    "x": 760,
+    "y": 220,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Network u(x, t); loss = residual at random (x, t) + boundary + initial terms."
+   },
+   {
+    "id": "cmp",
+    "label": "Compare",
+    "sub": "accuracy, cost, flexibility",
+    "x": 760,
+    "y": 400,
+    "w": 170,
+    "h": 64,
+    "sys": "apply",
+    "detail": "Classical: fast, accurate for forward problems. PINN: flexible geometry, data fusion, inverse problems."
+   }
+  ],
+  "edges": [
+   {
+    "from": "pde",
+    "to": "grid",
+    "label": ""
+   },
+   {
+    "from": "grid",
+    "to": "fd",
+    "label": ""
+   },
+   {
+    "from": "fd",
+    "to": "stab",
+    "label": "must respect"
+   },
+   {
+    "from": "pde",
+    "to": "pinn",
+    "label": ""
+   },
+   {
+    "from": "pinn",
+    "to": "cmp",
+    "label": ""
+   },
+   {
+    "from": "stab",
+    "to": "cmp",
+    "label": ""
+   }
+  ],
+  "tour": [
+   {
+    "focus": [
+     "pde"
+    ],
+    "text": "Start from the equation and its boundary and initial conditions."
+   },
+   {
+    "focus": [
+     "grid",
+     "fd"
+    ],
+    "text": "The classical route: a grid, and updates from neighbours.",
+    "edges": [
+     [
+      "pde",
+      "grid"
+     ],
+     [
+      "grid",
+      "fd"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "stab"
+    ],
+    "text": "Explicit updates are stable only if r ≤ 0.5.",
+    "edges": [
+     [
+      "fd",
+      "stab"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "pinn"
+    ],
+    "text": "The PINN route: no grid, a residual loss at scattered points.",
+    "edges": [
+     [
+      "pde",
+      "pinn"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "cmp"
+    ],
+    "text": "Each wins in different situations.",
+    "edges": [
+     [
+      "pinn",
+      "cmp"
+     ],
+     [
+      "stab",
+      "cmp"
+     ]
+    ]
+   }
+  ]
+ },
+ "sections": [
+  {
+   "heading": "Finite differences for heat",
+   "html": "<p>Approximate the second derivative by neighbours: ∂²u/∂x² ≈ (u<sub>i+1</sub> − 2u<sub>i</sub> + u<sub>i−1</sub>)/Δx². With an Euler step in time:</p><div class=\"eq\">u<sub>i</sub><sup>n+1</sup> = u<sub>i</sub><sup>n</sup> + r (u<sub>i+1</sub><sup>n</sup> − 2u<sub>i</sub><sup>n</sup> + u<sub>i−1</sub><sup>n</sup>),  r = αΔt/Δx²</div><p>A hot point loses heat to cooler neighbours; a cold point gains. Ends are held at zero (boundary conditions).</p>"
+  },
+  {
+   "heading": "Stability: the r ≤ 0.5 rule",
+   "html": "<p>The explicit scheme is stable only for r ≤ 0.5 (von Neumann analysis). In the lab with 41 points: r = 0.25 and r = 0.5 give errors below 0.0004, r = 0.52 gives 0.12, and r = 0.6 explodes to 10<sup>7</sup>. Halving Δx forces a quarter of the time step, which is why implicit schemes (Crank–Nicolson) are used for fine grids.</p>"
+  },
+  {
+   "heading": "Traffic: finite volumes",
+   "html": "<p>Conservation laws such as the LWR traffic model have shock waves (sudden jams), where finite differences oscillate. <b>Finite-volume</b> schemes track how many vehicles cross each cell boundary; <b>Godunov's scheme</b> (in traffic, the cell transmission model of Daganzo 1994) takes the smaller of upstream demand and downstream supply. Module 3.1 uses it as the physics inside a traffic state estimator. Its time step obeys the CFL condition: v<sub>f</sub>Δt/Δx ≤ 1.</p>"
+  },
+  {
+   "heading": "A PINN for the heat equation",
+   "html": "<p>Network u(x, t); loss = mean (u<sub>t</sub> − u<sub>xx</sub>)² at 1,000 random points, plus boundary terms u(0,t)² + u(1,t)², plus initial term (u(x,0) − sin πx)². The PyTorch lab trains in about 20 seconds and reaches a maximum error of about 0.04 at t = 0.1, while the finite-difference solver gets below 0.001 in a fraction of a second. For this forward problem the classical solver wins; PINNs earn their place when data must be fused or parameters inferred.</p>"
+  }
+ ],
+ "callouts": [
+  {
+   "after": 1,
+   "kind": "try",
+   "title": "Try it",
+   "html": "<p>Set r = 0.49, then 0.51. Look closely at the profile: where do the first wiggles appear?</p>"
+  },
+  {
+   "after": 3,
+   "kind": "trap",
+   "title": "Fair comparison",
+   "html": "<p>Papers sometimes compare a carefully tuned PINN with a crude classical solver. Compare at equal accuracy or equal computing time.</p>"
+  }
+ ],
+ "explorer": {
+  "widget": "heat",
+  "intro": "Solve the heat equation with explicit finite differences. Change the stability number r.",
+  "predict": "What happens just above r = 0.5?"
+ },
+ "code": [
+  {
+   "title": "Heat equation solver and stability check",
+   "lang": "python",
+   "file": "labs/go2/m23_heat.py",
+   "runnable": true,
+   "explain": "Explicit finite differences for four values of r.",
+   "expected": "r = 0.25: 192 steps, max error 7.10e-05\nr = 0.50:  96 steps, max error 3.68e-04\nr = 0.52:  93 steps, max error 1.20e-01  <- unstable\nr = 0.60:  80 steps, max error 4.75e+07  <- unstable"
+  },
+  {
+   "title": "A PINN for the heat equation (PyTorch)",
+   "lang": "python",
+   "file": "labs/go2/m23_pinn_heat_torch.py",
+   "runnable": false,
+   "explain": "Physics, boundary and initial losses only; no data inside the domain. Requires pip install torch; about 20 seconds.",
+   "expected": "iteration 4000: loss 2.51e-03\nmax error at t = 0.1: 0.0402"
+  }
+ ],
+ "takeaways": [
+  "Grid solvers update each point from its neighbours.",
+  "Explicit finite differences for heat need r = αΔt/Δx² ≤ 0.5.",
+  "Finite-volume (Godunov) schemes handle traffic shock waves under a CFL limit.",
+  "PINNs need no grid; classical solvers usually win simple forward problems."
+ ],
+ "quiz": [
+  {
+   "q": "The stability number for the explicit heat scheme is…",
+   "options": [
+    "αΔx/Δt",
+    "αΔt/Δx²",
+    "Δt/α",
+    "Δx²"
+   ],
+   "answer": 1,
+   "explain": "r = αΔt/Δx²."
+  },
+  {
+   "q": "The explicit scheme is stable if…",
+   "options": [
+    "r ≤ 0.5",
+    "r ≥ 1",
+    "r = 2",
+    "Always"
+   ],
+   "answer": 0,
+   "explain": "Von Neumann analysis."
+  },
+  {
+   "q": "Which scheme suits traffic shock waves?",
+   "options": [
+    "Central finite differences",
+    "Godunov finite-volume (cell transmission model)",
+    "Polynomial fitting",
+    "None"
+   ],
+   "answer": 1,
+   "explain": "Demand and supply."
+  },
+  {
+   "q": "For a simple forward heat problem, a PINN is usually…",
+   "options": [
+    "Faster and more accurate than finite differences",
+    "Slower and less accurate than a good classical solver",
+    "Identical",
+    "Impossible"
+   ],
+   "answer": 1,
+   "explain": "Classical solvers win there."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Finite differences",
+   "def": "Approximating derivatives by differences between neighbouring grid values."
+  },
+  {
+   "term": "Finite volumes",
+   "def": "Tracking conserved quantities by fluxes across cell boundaries."
+  },
+  {
+   "term": "Stability condition",
+   "def": "A limit on step sizes beyond which numerical errors grow without bound."
+  },
+  {
+   "term": "CFL condition",
+   "def": "Courant–Friedrichs–Lewy limit: information must not travel more than one cell per step."
+  },
+  {
+   "term": "Boundary condition",
+   "def": "A constraint on the solution at the edges of the domain."
+  }
+ ],
+ "resources": [
+  {
+   "title": "LeVeque: Finite Volume Methods for Hyperbolic Problems",
+   "url": "https://doi.org/10.1017/CBO9780511791253",
+   "why": "The standard text on shocks and Godunov schemes."
+  },
+  {
+   "title": "Daganzo (1994): The cell transmission model",
+   "url": "https://doi.org/10.1016/0191-2615(94)90002-7",
+   "why": "Godunov's scheme for traffic."
+  },
+  {
+   "title": "Grossmann et al. (2024): Can PINNs beat the finite element method?",
+   "url": "https://doi.org/10.1093/imamat/hxae011",
+   "why": "A careful, fair comparison."
+  }
+ ]
+}

@@ -1,0 +1,369 @@
+{
+ "id": "1.1",
+ "go": 1,
+ "slug": "what-is-physical-ai-and-sciml",
+ "title": "What Physical AI and scientific machine learning are",
+ "minutes": 35,
+ "tag": "Big picture",
+ "systems": [
+  "physics",
+  "learn"
+ ],
+ "summary": "Scientific machine learning blends physical laws with learning from data. Physical AI puts such models into machines that sense and act in the real world, from robots to automated vehicles.",
+ "outcomes": [
+  "say what scientific machine learning (SciML) and Physical AI mean, in one sentence each",
+  "place a model on the spectrum from physics-based to data-driven",
+  "explain why pure data fits fail outside the data and pure physics misses details",
+  "name three transport problems where SciML helps"
+ ],
+ "narration_en": "Engineers have always had two ways to predict the world. The first is physics: write down the laws, such as conservation of mass or Newton's laws, and solve them. The second is data: collect measurements and fit a pattern. Physics models extrapolate well but miss details we did not model. Data models capture details but fail where they have no data. Scientific machine learning, or SciML, combines the two. It builds machine learning models that respect physical laws, discovers equations from data, and builds fast surrogates of slow simulations. Physical AI goes one step further: it puts such models inside machines that sense and act in the physical world, such as robots, drones and automated vehicles, where mistakes have physical consequences. In transport, SciML estimates traffic from a few sensors, predicts crash risk, emulates climate and energy models, and runs digital twins of cities. In this module you will slide a model from pure data to pure physics and see where each one breaks.",
+ "narration_ar": "لدى المهندسين منذ القدم طريقتان للتنبؤ بالعالم. الأولى هي الفيزياء: نكتب القوانين، مثل حفظ الكتلة أو قوانين نيوتن، ثم نحلها. والثانية هي البيانات: نجمع القياسات ونستخرج نمطاً منها. تستقرئ النماذج الفيزيائية جيداً لكنها تغفل تفاصيل لم ننمذجها، أما نماذج البيانات فتلتقط التفاصيل لكنها تخفق حيث لا توجد بيانات. ويجمع تعلم الآلة العلمي بين الطريقتين: فهو يبني نماذج تعلم آلي تحترم القوانين الفيزيائية، ويكتشف المعادلات من البيانات، ويبني بدائل سريعة لمحاكاة بطيئة. ويذهب الذكاء الاصطناعي المادي خطوة أبعد، إذ يضع هذه النماذج داخل آلات تستشعر العالم المادي وتتصرف فيه، كالروبوتات والطائرات المسيّرة والمركبات الآلية، حيث تكون للأخطاء عواقب مادية. وفي النقل يقدّر تعلم الآلة العلمي حركة المرور من عدد قليل من أجهزة الاستشعار، ويتنبأ بخطر الحوادث، ويحاكي نماذج المناخ والطاقة، ويشغّل توائم رقمية للمدن. ستحرك في هذه الوحدة نموذجاً من البيانات الخالصة إلى الفيزياء الخالصة وترى أين يخفق كل منهما.",
+ "diagram": {
+  "title": "Two ways of knowing, and the bridge between them",
+  "caption": "Physics gives structure, data gives detail; scientific machine learning combines them, and Physical AI acts on the result.",
+  "nodes": [
+   {
+    "id": "phy",
+    "label": "Physical laws",
+    "sub": "conservation, motion, energy",
+    "x": 140,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "physics",
+    "detail": "Equations we trust: conservation of mass and energy, Newton's laws, traffic-flow and heat equations. They hold everywhere, even where we have no data."
+   },
+   {
+    "id": "dat",
+    "label": "Data",
+    "sub": "sensors, experiments, logs",
+    "x": 140,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "data",
+    "detail": "Measurements from sensors, cameras, simulations and experiments. Rich in detail, but noisy, incomplete and only where we looked."
+   },
+   {
+    "id": "sci",
+    "label": "Scientific ML",
+    "sub": "physics + learning",
+    "x": 450,
+    "y": 220,
+    "w": 190,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Machine learning that respects physics: physics-informed networks, equation discovery, operator learning, hybrid models and surrogates."
+   },
+   {
+    "id": "mdl",
+    "label": "Trustworthy model",
+    "sub": "accurate, general, fast",
+    "x": 760,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "system",
+    "detail": "A model that fits the data, obeys the laws, extrapolates sensibly and can run fast enough to use."
+   },
+   {
+    "id": "pai",
+    "label": "Physical AI",
+    "sub": "sense, decide, act",
+    "x": 760,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "apply",
+    "detail": "Robots, drones, automated vehicles and smart infrastructure that use such models to act in the real world, safely."
+   },
+   {
+    "id": "unc",
+    "label": "Uncertainty",
+    "sub": "how sure are we?",
+    "x": 450,
+    "y": 440,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "Every model is wrong somewhere. Knowing how wrong, and where, is what makes a model safe to use for decisions."
+   }
+  ],
+  "edges": [
+   {
+    "from": "phy",
+    "to": "sci",
+    "label": "structure"
+   },
+   {
+    "from": "dat",
+    "to": "sci",
+    "label": "detail"
+   },
+   {
+    "from": "sci",
+    "to": "mdl",
+    "label": "builds"
+   },
+   {
+    "from": "mdl",
+    "to": "pai",
+    "label": "drives"
+   },
+   {
+    "from": "pai",
+    "to": "dat",
+    "label": "new data",
+    "sys": "data"
+   },
+   {
+    "from": "unc",
+    "to": "mdl",
+    "label": "qualifies",
+    "sys": "risk"
+   }
+  ],
+  "tour": [
+   {
+    "focus": [
+     "phy"
+    ],
+    "text": "Physics: laws that hold everywhere, but only describe what we chose to model."
+   },
+   {
+    "focus": [
+     "dat"
+    ],
+    "text": "Data: rich detail, but only where and when we measured."
+   },
+   {
+    "focus": [
+     "phy",
+     "dat",
+     "sci"
+    ],
+    "text": "Scientific machine learning uses both: physics for structure, data for detail.",
+    "edges": [
+     [
+      "phy",
+      "sci"
+     ],
+     [
+      "dat",
+      "sci"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "sci",
+     "mdl"
+    ],
+    "text": "The goal is a model that is accurate, general and fast.",
+    "edges": [
+     [
+      "sci",
+      "mdl"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "mdl",
+     "pai"
+    ],
+    "text": "Physical AI puts such models inside machines that sense and act.",
+    "edges": [
+     [
+      "mdl",
+      "pai"
+     ],
+     [
+      "pai",
+      "dat"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "unc"
+    ],
+    "text": "And every model must say how sure it is.",
+    "edges": [
+     [
+      "unc",
+      "mdl"
+     ]
+    ]
+   }
+  ]
+ },
+ "components": {
+  "caption": "Words you will meet in every module.",
+  "rows": [
+   {
+    "name": "Physics-based model",
+    "purpose": "Built from laws and equations",
+    "analogy": "A recipe written by a chemist"
+   },
+   {
+    "name": "Data-driven model",
+    "purpose": "Learned from examples",
+    "analogy": "Learning to cook by tasting"
+   },
+   {
+    "name": "Hybrid model",
+    "purpose": "Physics plus a learned correction",
+    "analogy": "A recipe adjusted by taste"
+   },
+   {
+    "name": "Surrogate",
+    "purpose": "A fast stand-in for a slow model",
+    "analogy": "A sketch instead of a painting"
+   },
+   {
+    "name": "Physical AI",
+    "purpose": "AI that senses and acts in the physical world",
+    "analogy": "A self-driving car"
+   }
+  ]
+ },
+ "sections": [
+  {
+   "heading": "Two ways to predict",
+   "html": "<p><b>Physics-based models</b> start from laws: mass is conserved, force equals mass times acceleration, heat flows from hot to cold. They work even in situations never measured, but only describe what we put in. <b>Data-driven models</b> learn patterns from examples. They capture details nobody wrote down, but they can be badly wrong outside the range of their data.</p>"
+  },
+  {
+   "heading": "Scientific machine learning",
+   "html": "<p><b>Scientific machine learning (SciML)</b> combines the two. Its main tools, which you will meet in this course:</p><ul><li><b>Physics-informed neural networks</b>: networks trained to fit data <i>and</i> obey an equation.</li><li><b>Equation discovery</b>: finding the law itself from data.</li><li><b>Operator learning and surrogates</b>: fast stand-ins for slow simulators.</li><li><b>Hybrid models</b>: physics plus a learned correction.</li><li><b>Uncertainty quantification</b>: saying how sure we are.</li></ul>"
+  },
+  {
+   "heading": "Physical AI",
+   "html": "<p><b>Physical AI</b> is artificial intelligence that perceives and acts in the physical world: robots, drones, automated vehicles, smart traffic signals. Its models must respect physics (a car cannot stop instantly), run in real time and be safe when wrong. That is why SciML and Physical AI belong together: physical structure makes learned models more reliable.</p>"
+  },
+  {
+   "heading": "Why transport needs it",
+   "html": "<p>Transport is full of physics (traffic waves, vehicle dynamics, energy) and full of data (detectors, cameras, phones), but data are always sparse where it matters: during crashes, at extreme densities, in future climates. Go 3 applies SciML to traffic estimation, automated vehicles, safety, energy and emissions, integrated assessment models such as GCAM, crowds and digital twins.</p>"
+  }
+ ],
+ "callouts": [
+  {
+   "after": 1,
+   "kind": "try",
+   "title": "Try it",
+   "html": "<p>In the explorer, set trust in physics to 0 and then to 1. Where does each model fail? Can a value in between beat both?</p>"
+  },
+  {
+   "after": 3,
+   "kind": "research",
+   "title": "Research angle",
+   "html": "<p>Many transport problems are 'small data' problems in disguise: plenty of normal data, very little about the rare events we care about. Physics is how we bridge that gap.</p>"
+  }
+ ],
+ "explorer": {
+  "widget": "spectrum",
+  "intro": "Measurements exist only for the first 2 seconds. Slide from a pure data fit to a pure physics model.",
+  "predict": "Which model will predict best after t = 2: the data fit, the physics model, or a mix?"
+ },
+ "code": [
+  {
+   "title": "Data fit versus physics",
+   "lang": "python",
+   "runnable": true,
+   "source": "import numpy as np\nrng = np.random.default_rng(11)\ntruth = lambda t: np.exp(-0.3*t)*np.cos(2*t)\nphys = lambda t: np.exp(-0.45*t)*np.cos(1.85*t)   # physics model, slightly wrong parameters\nt_data = np.linspace(0, 2, 8)\ny_data = truth(t_data) + 0.05*rng.standard_normal(8)\ncoef = np.polyfit(t_data, y_data, 5)              # pure data model\nt_new = np.linspace(2.1, 6, 40)\nerr = lambda f: np.sqrt(np.mean((f(t_new) - truth(t_new))**2))\nprint(f'data fit error beyond the data: {err(lambda t: np.polyval(coef, t)):.2f}')\nprint(f'physics error beyond the data:  {err(phys):.2f}')",
+   "explain": "A degree-5 polynomial fits 8 points well but explodes after t = 2; the slightly wrong physics model stays close.",
+   "expected": "data fit error beyond the data: 259.02\nphysics error beyond the data:  0.13"
+  }
+ ],
+ "takeaways": [
+  "Physics extrapolates but misses details; data captures details but fails outside its range.",
+  "Scientific machine learning combines physical laws with learning from data.",
+  "Physical AI puts models into machines that sense and act in the real world.",
+  "Transport is physics-rich but data-sparse where it matters most."
+ ],
+ "quiz": [
+  {
+   "q": "A pure data-driven model is most likely to fail…",
+   "options": [
+    "Inside the range of its data",
+    "Far outside the range of its data",
+    "Never",
+    "Only with clean data"
+   ],
+   "answer": 1,
+   "explain": "Data models can be badly wrong where they have no data."
+  },
+  {
+   "q": "Scientific machine learning mainly aims to…",
+   "options": [
+    "Replace physics with data",
+    "Combine physical laws with learning from data",
+    "Collect more data",
+    "Make models slower"
+   ],
+   "answer": 1,
+   "explain": "It uses both."
+  },
+  {
+   "q": "Which is an example of Physical AI?",
+   "options": [
+    "A spam filter",
+    "An automated vehicle",
+    "A spreadsheet",
+    "A search engine"
+   ],
+   "answer": 1,
+   "explain": "It senses and acts in the physical world."
+  },
+  {
+   "q": "Why do transport problems need physics?",
+   "options": [
+    "Data are always perfect",
+    "Data are sparse exactly where it matters, such as rare events",
+    "Physics is cheaper than data",
+    "Laws change every year"
+   ],
+   "answer": 1,
+   "explain": "Physics fills gaps in data."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Scientific machine learning (SciML)",
+   "def": "Machine learning methods that combine data with scientific knowledge such as physical laws."
+  },
+  {
+   "term": "Physical AI",
+   "def": "AI systems that perceive and act in the physical world, such as robots and automated vehicles."
+  },
+  {
+   "term": "Data-driven model",
+   "def": "A model learned from examples without built-in laws."
+  },
+  {
+   "term": "Physics-based model",
+   "def": "A model built from physical laws and equations."
+  },
+  {
+   "term": "Extrapolation",
+   "def": "Predicting outside the range of the data used to build a model."
+  }
+ ],
+ "resources": [
+  {
+   "title": "Baker et al. (2019): Basic Research Needs for Scientific Machine Learning (US DOE)",
+   "url": "https://doi.org/10.2172/1478744",
+   "why": "The report that named and framed the field."
+  },
+  {
+   "title": "Karniadakis et al. (2021): Physics-informed machine learning",
+   "url": "https://doi.org/10.1038/s42254-021-00314-5",
+   "why": "A readable review in Nature Reviews Physics."
+  },
+  {
+   "title": "Steve Brunton: Physics-informed machine learning (video course)",
+   "url": "https://www.youtube.com/@Eigensteve",
+   "why": "Clear lectures on SciML for beginners."
+  }
+ ]
+}

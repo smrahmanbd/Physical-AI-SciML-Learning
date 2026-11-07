@@ -1,0 +1,350 @@
+{
+ "id": "2.1",
+ "go": 2,
+ "slug": "workflow-and-toolchain",
+ "title": "The SciML workflow and toolchain",
+ "minutes": 45,
+ "tag": "Workflow",
+ "systems": [
+  "data",
+  "system"
+ ],
+ "summary": "A reliable SciML project follows a fixed workflow: frame the question, gather data and physics, split data honestly, build a baseline, add physics, validate and document. Tools: Python, NumPy, PyTorch or JAX.",
+ "outcomes": [
+  "lay out the steps of a SciML project from question to deployment",
+  "set up a Python environment with NumPy, PyTorch or JAX",
+  "split time-series data without leakage",
+  "build a simple baseline before any neural network"
+ ],
+ "narration_en": "Go 2 is about building. Before writing a single network, set up a workflow that protects you from the most common mistakes. Step one: frame the question precisely, including what you will predict, from what inputs, and how you will judge success. Step two: gather the physics you trust and the data you have, and look at the data. Step three: split the data honestly. For time series, such as traffic counts, split by time: train on the past, validate on later data. A random split lets the model peek at hours next to the ones it is tested on, and reports an error far better than you will get in practice. Step four: build a simple baseline, such as a physics model alone or a linear regression, so you know what a fancy model must beat. Step five: add learning and physics, step by step. Step six: validate, quantify uncertainty and document everything so others can reproduce it. The toolchain is Python with NumPy, plus PyTorch or JAX for automatic differentiation. In this module you will see how a random split fools you.",
+ "narration_ar": "المرحلة الثانية تدور حول البناء. وقبل كتابة أي شبكة، أعدّ سير عمل يحميك من أكثر الأخطاء شيوعاً. الخطوة الأولى: صُغ السؤال بدقة، بما في ذلك ما ستتنبأ به، ومن أي مدخلات، وكيف ستحكم على النجاح. الخطوة الثانية: اجمع الفيزياء التي تثق بها والبيانات المتاحة لديك، وانظر إلى البيانات. الخطوة الثالثة: قسّم البيانات بنزاهة. ففي السلاسل الزمنية، كأعداد المركبات، قسّم حسب الزمن: درّب على الماضي وتحقق على بيانات لاحقة. أما التقسيم العشوائي فيسمح للنموذج باختلاس النظر إلى ساعات مجاورة لتلك التي يُختبر عليها، فيعطي خطأً أفضل بكثير مما ستحصل عليه فعلياً. الخطوة الرابعة: ابنِ نموذجاً مرجعياً بسيطاً، كنموذج فيزيائي وحده أو انحدار خطي، لتعرف ما الذي يجب أن يتفوق عليه النموذج المعقد. الخطوة الخامسة: أضف التعلم والفيزياء خطوة خطوة. الخطوة السادسة: تحقق، وقدّر عدم اليقين، ووثّق كل شيء ليتمكن الآخرون من إعادة إنتاجه. وأدوات العمل هي بايثون مع NumPy، إضافة إلى PyTorch أو JAX للاشتقاق التلقائي. ستشاهد في هذه الوحدة كيف يخدعك التقسيم العشوائي.",
+ "diagram": {
+  "title": "A SciML project, step by step",
+  "caption": "Each step guards against a typical failure; skipping one usually shows up later as a model that cannot be trusted.",
+  "nodes": [
+   {
+    "id": "q",
+    "label": "1. Frame the question",
+    "sub": "target, inputs, metric",
+    "x": 140,
+    "y": 90,
+    "w": 200,
+    "h": 64,
+    "sys": "apply",
+    "detail": "What exactly do you predict, from what, at what horizon, and how will you score it? Write it down before touching data."
+   },
+   {
+    "id": "d",
+    "label": "2. Data and physics",
+    "sub": "look, clean, list laws",
+    "x": 140,
+    "y": 260,
+    "w": 200,
+    "h": 64,
+    "sys": "data",
+    "detail": "Plot the data. List the equations you trust and those you do not. Note units, gaps and sensor quirks."
+   },
+   {
+    "id": "s",
+    "label": "3. Honest split",
+    "sub": "by time or by location",
+    "x": 140,
+    "y": 430,
+    "w": 200,
+    "h": 64,
+    "sys": "risk",
+    "detail": "Train, validation, test. Split time series by time and spatial data by location to avoid leakage."
+   },
+   {
+    "id": "b",
+    "label": "4. Baseline",
+    "sub": "physics alone, linear model",
+    "x": 450,
+    "y": 430,
+    "w": 200,
+    "h": 64,
+    "sys": "system",
+    "detail": "A simple model sets the bar. If a network cannot beat it, the network is not worth it."
+   },
+   {
+    "id": "m",
+    "label": "5. Add learning + physics",
+    "sub": "PINN, hybrid, surrogate",
+    "x": 450,
+    "y": 260,
+    "w": 210,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Add complexity one step at a time, checking validation error after each."
+   },
+   {
+    "id": "v",
+    "label": "6. Validate + UQ",
+    "sub": "unseen data, uncertainty",
+    "x": 760,
+    "y": 260,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "Test once on untouched data; report intervals, not just point errors."
+   },
+   {
+    "id": "r",
+    "label": "7. Document + share",
+    "sub": "code, seeds, versions",
+    "x": 760,
+    "y": 430,
+    "w": 170,
+    "h": 64,
+    "sys": "system",
+    "detail": "Record environment, random seeds, data versions; share code so results can be reproduced."
+   }
+  ],
+  "edges": [
+   {
+    "from": "q",
+    "to": "d",
+    "label": ""
+   },
+   {
+    "from": "d",
+    "to": "s",
+    "label": ""
+   },
+   {
+    "from": "s",
+    "to": "b",
+    "label": ""
+   },
+   {
+    "from": "b",
+    "to": "m",
+    "label": ""
+   },
+   {
+    "from": "m",
+    "to": "v",
+    "label": ""
+   },
+   {
+    "from": "v",
+    "to": "r",
+    "label": ""
+   },
+   {
+    "from": "v",
+    "to": "m",
+    "label": "iterate",
+    "sys": "risk"
+   }
+  ],
+  "tour": [
+   {
+    "focus": [
+     "q"
+    ],
+    "text": "Start by writing the question and the success metric."
+   },
+   {
+    "focus": [
+     "d",
+     "s"
+    ],
+    "text": "Look at the data, list the physics, then split honestly.",
+    "edges": [
+     [
+      "q",
+      "d"
+     ],
+     [
+      "d",
+      "s"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "b"
+    ],
+    "text": "Build a simple baseline to beat.",
+    "edges": [
+     [
+      "s",
+      "b"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "m"
+    ],
+    "text": "Add learning and physics step by step.",
+    "edges": [
+     [
+      "b",
+      "m"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "v",
+     "r"
+    ],
+    "text": "Validate on unseen data, quantify uncertainty, and document.",
+    "edges": [
+     [
+      "m",
+      "v"
+     ],
+     [
+      "v",
+      "r"
+     ],
+     [
+      "v",
+      "m"
+     ]
+    ]
+   }
+  ]
+ },
+ "sections": [
+  {
+   "heading": "Step 1–2: question, data and physics",
+   "html": "<p>Write a one-line question, for example: <i>predict hourly traffic flow at detector D for the next 24 hours from the past four weeks, scored by mean absolute error</i>. Then plot the data before modelling: daily and weekly patterns, missing hours, sensor failures. List the physics you trust (conservation of vehicles, capacity limits) and the parameters you do not know.</p>"
+  },
+  {
+   "heading": "Step 3: split without leakage",
+   "html": "<p>Leakage is information from the test set sneaking into training. In the explorer, a forecaster that averages the three nearest known hours reports an error of about 90 veh/h with a random split but about 250 veh/h with a time split; its real error next week is about 400 veh/h. The time split is honest; the random split is not. Rules: split time series by time, spatial data by site, and fit any normalisation on training data only.</p>"
+  },
+  {
+   "heading": "Step 4: baselines",
+   "html": "<p>Always build the simplest reasonable model first: yesterday's value at the same hour, a physics model alone, or a linear regression. Report your SciML model's improvement over this baseline. Many published deep-learning results shrink or vanish against a good baseline.</p>"
+  },
+  {
+   "heading": "The toolchain",
+   "html": "<p><b>Python</b> with <b>NumPy</b> and <b>SciPy</b> for arrays and classical solvers; <b>PyTorch</b> or <b>JAX</b> for neural networks and automatic differentiation; <b>DeepXDE</b>, <b>NVIDIA PhysicsNeMo</b> (formerly Modulus) or <b>NeuroMANCER</b> for physics-informed models; <b>PySINDy</b> for equation discovery; <b>scikit-learn</b> or <b>GPyTorch</b> for Gaussian processes. Use a virtual environment, pin versions, and fix random seeds. Every Go 2 lab has a NumPy version that runs in your browser and, where useful, a PyTorch version to download.</p>"
+  }
+ ],
+ "callouts": [
+  {
+   "after": 1,
+   "kind": "try",
+   "title": "Try it",
+   "html": "<p>Switch the explorer between random and time splits. Which validation error is closer to the real error next week?</p>"
+  },
+  {
+   "after": 3,
+   "kind": "model",
+   "title": "Setting up",
+   "html": "<p>A minimal environment: <code>python -m venv sciml</code>, then <code>pip install numpy scipy matplotlib torch</code>. Save it with <code>pip freeze &gt; requirements.txt</code>.</p>"
+  }
+ ],
+ "explorer": {
+  "widget": "split",
+  "intro": "Three weeks of hourly traffic flow. A simple forecaster is validated two ways.",
+  "predict": "Which split will give the more optimistic validation error?"
+ },
+ "code": [
+  {
+   "title": "Random versus time-based splits",
+   "lang": "python",
+   "file": "labs/go2/m21_workflow.py",
+   "runnable": true,
+   "explain": "The same forecaster, two validation schemes, and the error it actually achieves next week.",
+   "expected": "random split: validation error   106 veh/h, real error next week   424 veh/h\ntime   split: validation error   272 veh/h, real error next week   424 veh/h"
+  }
+ ],
+ "takeaways": [
+  "Write the question and the success metric before modelling.",
+  "Split time series by time and spatial data by location to avoid leakage.",
+  "Always compare against a simple baseline.",
+  "Use Python with NumPy plus PyTorch or JAX; pin versions and seeds."
+ ],
+ "quiz": [
+  {
+   "q": "For traffic time series, the honest split is…",
+   "options": [
+    "Random hours",
+    "By time: train on the past, validate on later data",
+    "By alphabetical detector name",
+    "No split"
+   ],
+   "answer": 1,
+   "explain": "Mimics real forecasting."
+  },
+  {
+   "q": "Leakage means…",
+   "options": [
+    "Data lost from a disk",
+    "Test information sneaking into training",
+    "Too few parameters",
+    "A slow model"
+   ],
+   "answer": 1,
+   "explain": "The model peeks at the answer."
+  },
+  {
+   "q": "Why build a baseline first?",
+   "options": [
+    "To save time later",
+    "To know what a complex model must beat",
+    "Because networks need it",
+    "It is required by PyTorch"
+   ],
+   "answer": 1,
+   "explain": "Sets the bar."
+  },
+  {
+   "q": "Which library provides automatic differentiation?",
+   "options": [
+    "Matplotlib",
+    "PyTorch",
+    "Pandas",
+    "Requests"
+   ],
+   "answer": 1,
+   "explain": "PyTorch and JAX."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Data leakage",
+   "def": "Information from validation or test data influencing training, giving over-optimistic results."
+  },
+  {
+   "term": "Baseline",
+   "def": "A simple reference model that a new method must outperform."
+  },
+  {
+   "term": "Train/validation/test split",
+   "def": "Dividing data for fitting, tuning and final evaluation."
+  },
+  {
+   "term": "Reproducibility",
+   "def": "The ability of others to rerun an analysis and get the same results."
+  },
+  {
+   "term": "Virtual environment",
+   "def": "An isolated Python installation with pinned package versions."
+  }
+ ],
+ "resources": [
+  {
+   "title": "Kapoor and Narayanan (2023): Leakage and the reproducibility crisis in ML-based science",
+   "url": "https://doi.org/10.1016/j.patter.2023.100804",
+   "why": "Leakage across 17 fields."
+  },
+  {
+   "title": "DeepXDE documentation",
+   "url": "https://deepxde.readthedocs.io/",
+   "why": "A library for physics-informed learning with many examples."
+  },
+  {
+   "title": "PyTorch tutorials",
+   "url": "https://pytorch.org/tutorials/",
+   "why": "Official beginner tutorials."
+  }
+ ]
+}

@@ -1,0 +1,330 @@
+{
+ "id": "1.6",
+ "go": 1,
+ "slug": "data-noise-and-overfitting",
+ "title": "Data, noise and overfitting",
+ "minutes": 35,
+ "tag": "Foundations",
+ "systems": [
+  "data",
+  "risk"
+ ],
+ "summary": "Real data are noisy and limited. Models that are too flexible learn the noise; models that are too simple miss the pattern. Judge every model on data it has not seen.",
+ "outcomes": [
+  "explain underfitting and overfitting with an example",
+  "separate training error from test error",
+  "describe how noise and data quantity change the best model complexity",
+  "list simple defences: validation, regularisation and physics"
+ ],
+ "narration_en": "Every measurement contains noise: sensor errors, rounding, random fluctuations. A model has to learn the pattern without learning the noise. If the model is too simple, say a straight line through a wave, it misses the pattern: this is underfitting. If it is too flexible, say a polynomial of degree thirteen through fifteen points, it threads every noisy point and wiggles wildly in between: this is overfitting. The training error keeps falling as the model grows, but the error on new data first falls and then rises. The best model sits in between, and where exactly depends on how much data and how much noise we have. The only honest judge is data the model has not seen: a validation or test set. Common defences against overfitting include more data, simpler models, regularisation, which penalises large weights, and early stopping. In scientific machine learning, physics is a powerful regulariser: an equation forbids many of the wiggles that noise would otherwise produce. In this module you will push a model from underfitting to overfitting.",
+ "narration_ar": "كل قياس يحتوي على ضوضاء: أخطاء أجهزة الاستشعار، والتقريب، والتقلبات العشوائية. وعلى النموذج أن يتعلم النمط دون أن يتعلم الضوضاء. فإذا كان النموذج بسيطاً جداً، كخط مستقيم عبر موجة، فاته النمط، وهذا هو قصور التوافق. وإذا كان مرناً جداً، كمتعدد حدود من الدرجة الثالثة عشرة عبر خمس عشرة نقطة، مرّ بكل نقطة مشوشة وتمايل بعنف بينها، وهذا هو الإفراط في التوافق. يستمر خطأ التدريب في الانخفاض كلما كبر النموذج، أما الخطأ على البيانات الجديدة فينخفض أولاً ثم يرتفع. وأفضل نموذج يقع في الوسط، ويتوقف موضعه بالضبط على كمية البيانات ومقدار الضوضاء. والحَكَم النزيه الوحيد هو بيانات لم يرها النموذج: مجموعة تحقق أو اختبار. ومن الوسائل الشائعة لمقاومة الإفراط في التوافق: مزيد من البيانات، ونماذج أبسط، والتنظيم الذي يعاقب الأوزان الكبيرة، والإيقاف المبكر. وفي تعلم الآلة العلمي تُعدّ الفيزياء منظِّماً قوياً، فالمعادلة تمنع كثيراً من التموجات التي كانت الضوضاء ستنتجها. ستدفع في هذه الوحدة نموذجاً من قصور التوافق إلى الإفراط فيه.",
+ "diagram": {
+  "title": "The bias–variance balance",
+  "caption": "Model complexity trades missing the pattern against chasing the noise; unseen data reveal which is happening.",
+  "nodes": [
+   {
+    "id": "sig",
+    "label": "True signal",
+    "sub": "the pattern we want",
+    "x": 140,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "physics",
+    "detail": "The real relationship, for example how speed varies with density."
+   },
+   {
+    "id": "noi",
+    "label": "Noise",
+    "sub": "random errors",
+    "x": 140,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "data",
+    "detail": "Sensor error, rounding and random fluctuations. Different every time we measure."
+   },
+   {
+    "id": "cmp",
+    "label": "Model complexity",
+    "sub": "simple ↔ flexible",
+    "x": 450,
+    "y": 220,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Polynomial degree, number of neurons, number of features."
+   },
+   {
+    "id": "und",
+    "label": "Underfitting",
+    "sub": "misses the pattern",
+    "x": 760,
+    "y": 90,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "High error on training and test data. The model is too rigid (high bias)."
+   },
+   {
+    "id": "ovf",
+    "label": "Overfitting",
+    "sub": "learns the noise",
+    "x": 760,
+    "y": 260,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "Low training error, high test error. The model is too flexible (high variance)."
+   },
+   {
+    "id": "val",
+    "label": "Unseen data",
+    "sub": "validation, test",
+    "x": 760,
+    "y": 430,
+    "w": 170,
+    "h": 64,
+    "sys": "data",
+    "detail": "The honest judge: data not used in fitting. Choose complexity where its error is lowest."
+   },
+   {
+    "id": "reg",
+    "label": "Defences",
+    "sub": "data, regularisation, physics",
+    "x": 450,
+    "y": 430,
+    "w": 170,
+    "h": 64,
+    "sys": "system",
+    "detail": "More data, penalties on large weights, early stopping, and physical constraints."
+   }
+  ],
+  "edges": [
+   {
+    "from": "sig",
+    "to": "cmp",
+    "label": ""
+   },
+   {
+    "from": "noi",
+    "to": "cmp",
+    "label": ""
+   },
+   {
+    "from": "cmp",
+    "to": "und",
+    "label": "too simple"
+   },
+   {
+    "from": "cmp",
+    "to": "ovf",
+    "label": "too flexible"
+   },
+   {
+    "from": "val",
+    "to": "ovf",
+    "label": "reveals"
+   },
+   {
+    "from": "reg",
+    "to": "ovf",
+    "label": "prevents",
+    "sys": "data"
+   }
+  ],
+  "tour": [
+   {
+    "focus": [
+     "sig",
+     "noi"
+    ],
+    "text": "Data are the true signal plus noise."
+   },
+   {
+    "focus": [
+     "cmp",
+     "und"
+    ],
+    "text": "Too simple a model misses the pattern: underfitting.",
+    "edges": [
+     [
+      "cmp",
+      "und"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "cmp",
+     "ovf"
+    ],
+    "text": "Too flexible a model chases the noise: overfitting.",
+    "edges": [
+     [
+      "cmp",
+      "ovf"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "val"
+    ],
+    "text": "Only unseen data reveal overfitting.",
+    "edges": [
+     [
+      "val",
+      "ovf"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "reg"
+    ],
+    "text": "Defences: more data, regularisation and physics.",
+    "edges": [
+     [
+      "reg",
+      "ovf"
+     ]
+    ]
+   }
+  ]
+ },
+ "sections": [
+  {
+   "heading": "Signal plus noise",
+   "html": "<p>Think of every data point as <b>true value + noise</b>. If you measure the same traffic flow twice, you get two slightly different numbers. A model should capture what repeats (the signal), not what does not (the noise). With 15 points of a sine wave and noise of 0.15, a cubic polynomial captures the wave well; a straight line cannot.</p>"
+  },
+  {
+   "heading": "Training error lies",
+   "html": "<p>In the explorer, raising the polynomial degree from 1 to 13 lowers the training error steadily (0.48 → 0.06), but the error against the true curve first falls (to about 0.09 at degree 5) and then shoots up (to about 1.1 at degree 13). A model can look perfect on its own training data and be useless. Always keep data aside for testing.</p>"
+  },
+  {
+   "heading": "Defences",
+   "html": "<p><b>More data</b> lets flexible models settle down. <b>Regularisation</b> adds a penalty such as λ‖w‖² to the loss, discouraging extreme weights. <b>Early stopping</b> halts training when validation error starts to rise. <b>Physics</b> is the SciML defence: an equation residual penalises exactly the wiggles that noise creates, because real systems do not wiggle like that.</p>"
+  }
+ ],
+ "callouts": [
+  {
+   "after": 1,
+   "kind": "try",
+   "title": "Try it",
+   "html": "<p>Set degree 9 and increase the number of data points from 10 to 40. What happens to overfitting?</p>"
+  },
+  {
+   "after": 2,
+   "kind": "trap",
+   "title": "Common trap",
+   "html": "<p>Tuning a model again and again on the same test set slowly leaks the test set into the model. Keep a final test set untouched until the very end.</p>"
+  }
+ ],
+ "explorer": {
+  "widget": "noise",
+  "intro": "Fit polynomials of increasing degree to noisy samples of a wave.",
+  "predict": "As the degree rises, will the error on new data keep falling?"
+ },
+ "code": [
+  {
+   "title": "Training versus test error",
+   "lang": "python",
+   "runnable": true,
+   "source": "import numpy as np\nrng = np.random.default_rng(31)\nx = np.linspace(0, 1, 15); y = np.sin(2*np.pi*x) + 0.15*rng.standard_normal(15)\nxt = np.linspace(0, 1, 201); yt = np.sin(2*np.pi*xt)\nfor deg in [1, 3, 5, 9, 13]:\n    c = np.polynomial.polynomial.polyfit(2*x - 1, y, deg)\n    tr = np.sqrt(np.mean((np.polynomial.polynomial.polyval(2*x - 1, c) - y)**2))\n    te = np.sqrt(np.mean((np.polynomial.polynomial.polyval(2*xt - 1, c) - yt)**2))\n    print(f'degree {deg:2d}: train {tr:.3f}, test {te:.3f}')",
+   "explain": "Training error always falls with degree; test error has a minimum.",
+   "expected": "degree  1: train 0.500, test 0.467\ndegree  3: train 0.127, test 0.095\ndegree  5: train 0.110, test 0.066\ndegree  9: train 0.090, test 0.103\ndegree 13: train 0.053, test 0.412"
+  }
+ ],
+ "takeaways": [
+  "Data = signal + noise; models should learn the signal.",
+  "Underfitting misses the pattern; overfitting learns the noise.",
+  "Training error always falls with complexity; only unseen data reveal overfitting.",
+  "More data, regularisation, early stopping and physics all fight overfitting."
+ ],
+ "quiz": [
+  {
+   "q": "Overfitting means the model…",
+   "options": [
+    "Is too simple",
+    "Fits the training noise and fails on new data",
+    "Has too little data to run",
+    "Is physically correct"
+   ],
+   "answer": 1,
+   "explain": "Learns the noise."
+  },
+  {
+   "q": "Which error reveals overfitting?",
+   "options": [
+    "Training error",
+    "Error on unseen data",
+    "The number of parameters",
+    "The learning rate"
+   ],
+   "answer": 1,
+   "explain": "Test on unseen data."
+  },
+  {
+   "q": "Regularisation works by…",
+   "options": [
+    "Adding noise to the labels",
+    "Penalising large weights in the loss",
+    "Removing the test set",
+    "Increasing the learning rate"
+   ],
+   "answer": 1,
+   "explain": "Discourages extreme weights."
+  },
+  {
+   "q": "How does physics reduce overfitting?",
+   "options": [
+    "It adds data",
+    "The equation residual penalises unphysical wiggles",
+    "It removes noise from sensors",
+    "It is not related"
+   ],
+   "answer": 1,
+   "explain": "Physics is a regulariser."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Noise",
+   "def": "Random variation in measurements that does not repeat."
+  },
+  {
+   "term": "Underfitting",
+   "def": "A model too simple to capture the pattern."
+  },
+  {
+   "term": "Overfitting",
+   "def": "A model so flexible that it fits the noise."
+  },
+  {
+   "term": "Validation set",
+   "def": "Data held back to choose models and settings."
+  },
+  {
+   "term": "Regularisation",
+   "def": "A penalty in the loss that discourages overly complex solutions."
+  }
+ ],
+ "resources": [
+  {
+   "title": "Hastie, Tibshirani and Friedman: The Elements of Statistical Learning (free)",
+   "url": "https://hastie.su.domains/ElemStatLearn/",
+   "why": "Chapter 7 on model assessment."
+  },
+  {
+   "title": "Google: Machine Learning Crash Course, overfitting",
+   "url": "https://developers.google.com/machine-learning/crash-course/overfitting",
+   "why": "Short interactive lessons."
+  },
+  {
+   "title": "Karniadakis et al. (2021)",
+   "url": "https://doi.org/10.1038/s42254-021-00314-5",
+   "why": "Physics as a regulariser, in context."
+  }
+ ]
+}

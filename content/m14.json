@@ -1,0 +1,324 @@
+{
+ "id": "1.4",
+ "go": 1,
+ "slug": "learning-as-optimisation",
+ "title": "Learning as optimisation: loss, gradients, autodiff",
+ "minutes": 40,
+ "tag": "Foundations",
+ "systems": [
+  "learn",
+  "risk"
+ ],
+ "summary": "Training a model means minimising a loss by walking downhill along its gradient. Learning rate, momentum and local minima decide whether training succeeds; automatic differentiation computes the gradients.",
+ "outcomes": [
+  "define a loss function and explain why we minimise it",
+  "carry out gradient descent steps by hand",
+  "explain the effect of the learning rate and momentum",
+  "say what automatic differentiation does and why SciML depends on it"
+ ],
+ "narration_en": "How does a network learn? We define a loss: a single number that measures how wrong the model is, such as the average squared difference between predictions and data. Learning means finding the weights that make the loss small. Imagine the loss as a landscape of hills and valleys over all possible weights. Gradient descent stands on this landscape, feels which way is downhill, and takes a step. The gradient tells the direction, and the learning rate sets the step size. Too small and training crawls. Too large and it jumps across valleys or even flies off. Real landscapes have many valleys, called local minima, and momentum, which keeps some of the previous step, can help roll past small ones. Popular optimisers such as Adam adapt the step for each weight. Computing gradients by hand is impossible for millions of weights, so software uses automatic differentiation, which applies the chain rule exactly. SciML uses the same machinery to differentiate a network with respect to its inputs, which is how physics enters the loss.",
+ "narration_ar": "كيف تتعلم الشبكة؟ نعرّف دالة خسارة: رقماً واحداً يقيس مقدار خطأ النموذج، مثل متوسط مربع الفرق بين التنبؤات والبيانات. والتعلم يعني إيجاد الأوزان التي تجعل الخسارة صغيرة. تخيل الخسارة تضاريس من تلال ووديان فوق كل الأوزان الممكنة. يقف الانحدار التدرجي على هذه التضاريس، ويتحسس اتجاه النزول، ثم يخطو خطوة. يحدد التدرج الاتجاه، ويحدد معدل التعلم طول الخطوة. إذا كان صغيراً جداً زحف التدريب، وإذا كان كبيراً جداً قفز فوق الوديان أو طار بعيداً. وفي التضاريس الحقيقية وديان كثيرة تسمى القيم الصغرى المحلية، ويساعد الزخم، الذي يحتفظ بجزء من الخطوة السابقة، على تجاوز الصغيرة منها. وتكيّف خوارزميات شائعة مثل Adam طول الخطوة لكل وزن. وحساب التدرجات يدوياً مستحيل لملايين الأوزان، لذا تستخدم البرمجيات الاشتقاق التلقائي الذي يطبق قاعدة السلسلة بدقة. ويستخدم تعلم الآلة العلمي الأداة نفسها لاشتقاق الشبكة بالنسبة إلى مدخلاتها، وهكذا تدخل الفيزياء في دالة الخسارة.",
+ "diagram": {
+  "title": "The training loop",
+  "caption": "Predict, measure the loss, compute gradients by automatic differentiation, update the weights, repeat.",
+  "nodes": [
+   {
+    "id": "pred",
+    "label": "Predict",
+    "sub": "model output",
+    "x": 140,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "system",
+    "detail": "Run the model on training inputs to get predictions."
+   },
+   {
+    "id": "loss",
+    "label": "Loss",
+    "sub": "one number: how wrong",
+    "x": 450,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "For example mean squared error, (1/N) Σ (prediction − data)². Physics terms can be added (module 1.5)."
+   },
+   {
+    "id": "grad",
+    "label": "Gradient",
+    "sub": "which way is downhill",
+    "x": 760,
+    "y": 220,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "The vector of partial derivatives of the loss with respect to every weight."
+   },
+   {
+    "id": "ad",
+    "label": "Automatic differentiation",
+    "sub": "chain rule, exactly",
+    "x": 760,
+    "y": 420,
+    "w": 200,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Software (PyTorch, JAX) records each operation and applies the chain rule backwards to get exact gradients."
+   },
+   {
+    "id": "upd",
+    "label": "Update",
+    "sub": "w ← w − η × gradient",
+    "x": 450,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Take a step downhill. η is the learning rate. Momentum and Adam modify this step."
+   },
+   {
+    "id": "w",
+    "label": "Weights",
+    "sub": "the knobs",
+    "x": 140,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "data",
+    "detail": "The adjustable parameters. After many updates they settle in a valley of the loss."
+   }
+  ],
+  "edges": [
+   {
+    "from": "pred",
+    "to": "loss",
+    "label": ""
+   },
+   {
+    "from": "loss",
+    "to": "grad",
+    "label": ""
+   },
+   {
+    "from": "ad",
+    "to": "grad",
+    "label": "computes"
+   },
+   {
+    "from": "grad",
+    "to": "upd",
+    "label": ""
+   },
+   {
+    "from": "upd",
+    "to": "w",
+    "label": ""
+   },
+   {
+    "from": "w",
+    "to": "pred",
+    "label": "next pass"
+   }
+  ],
+  "tour": [
+   {
+    "focus": [
+     "pred",
+     "loss"
+    ],
+    "text": "Make predictions and measure how wrong they are with the loss.",
+    "edges": [
+     [
+      "pred",
+      "loss"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "grad",
+     "ad"
+    ],
+    "text": "Automatic differentiation computes the gradient: which way is downhill.",
+    "edges": [
+     [
+      "loss",
+      "grad"
+     ],
+     [
+      "ad",
+      "grad"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "upd"
+    ],
+    "text": "Step downhill by the learning rate times the gradient.",
+    "edges": [
+     [
+      "grad",
+      "upd"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "w",
+     "pred"
+    ],
+    "text": "Updated weights give new predictions, and the loop repeats.",
+    "edges": [
+     [
+      "upd",
+      "w"
+     ],
+     [
+      "w",
+      "pred"
+     ]
+    ]
+   }
+  ]
+ },
+ "sections": [
+  {
+   "heading": "Loss functions",
+   "html": "<p>A loss turns 'how wrong' into one number. The most common is the <b>mean squared error</b>:</p><div class=\"eq\">L(w) = (1/N) Σ (ŷᵢ(w) − yᵢ)²</div><p>Squaring makes all errors positive and punishes big ones more. In SciML we add terms that measure how badly the model breaks a physical law; minimising the total balances data and physics.</p>"
+  },
+  {
+   "heading": "Gradient descent by hand",
+   "html": "<p>Take L(w) = (w − 3)², gradient 2(w − 3), start w = 0, learning rate η = 0.1:</p><div class=\"eq\">w₁ = 0 − 0.1 × 2 × (0 − 3) = 0.6;  w₂ = 0.6 − 0.1 × 2 × (0.6 − 3) = 1.08</div><p>Each step closes 20% of the gap to the minimum at w = 3. With η = 1.0 the step overshoots to w = 6, then back to 0: it never settles. With η above 1.0 it diverges.</p>"
+  },
+  {
+   "heading": "Momentum, Adam and local minima",
+   "html": "<p>Real losses are bumpy, with many valleys. <b>Momentum</b> keeps a fraction of the last step, like a ball rolling, so it can pass small bumps and move faster along gentle slopes. <b>Adam</b> (Kingma and Ba 2015) adapts the step size for each weight and is the default for training physics-informed networks. Stochastic gradient descent uses random mini-batches of data, which adds helpful noise.</p>"
+  },
+  {
+   "heading": "Automatic differentiation",
+   "html": "<p>Automatic differentiation (autodiff) records every arithmetic operation in the model and applies the chain rule backwards (backpropagation). It gives exact derivatives, not finite-difference approximations, at a cost similar to one extra model evaluation. Crucially for SciML, autodiff can also give the derivative of the network's output with respect to its <i>input</i>, such as dŷ/dt, which is exactly what a differential equation needs.</p>"
+  }
+ ],
+ "callouts": [
+  {
+   "after": 1,
+   "kind": "try",
+   "title": "Try it",
+   "html": "<p>In the explorer, find a learning rate that reaches the deep valley near w = 4.3 without momentum. Then set momentum to 0.9 with a small learning rate.</p>"
+  },
+  {
+   "after": 3,
+   "kind": "model",
+   "title": "How SciML uses it",
+   "html": "<p>In a physics-informed network, autodiff gives dŷ/dt at any time t; the loss then penalises dŷ/dt + k ŷ ≠ 0. You will build exactly this in module 1.5 and Go 2.</p>"
+  }
+ ],
+ "explorer": {
+  "widget": "gd",
+  "intro": "Gradient descent on a bumpy loss, starting at w = −2. Change the learning rate and momentum.",
+  "predict": "Will a bigger learning rate always reach a lower loss?"
+ },
+ "code": [
+  {
+   "title": "Gradient descent and a numerical gradient check",
+   "lang": "python",
+   "runnable": true,
+   "source": "import numpy as np\nL  = lambda w: (w - 3)**2\ndL = lambda w: 2*(w - 3)\nfor lr in [0.1, 0.5, 1.0, 1.1]:\n    w = 0.0\n    for _ in range(20):\n        w -= lr * dL(w)\n    print(f'learning rate {lr}: w after 20 steps = {w:.3f}')\nh = 1e-5\nprint(f'gradient at w=1: exact {dL(1.0)}, finite difference {(L(1+h) - L(1-h))/(2*h):.4f}')",
+   "explain": "Small rates converge, 1.0 oscillates forever, above 1.0 diverges. Autodiff gives the exact gradient that finite differences only approximate.",
+   "expected": "learning rate 0.1: w after 20 steps = 2.965\nlearning rate 0.5: w after 20 steps = 3.000\nlearning rate 1.0: w after 20 steps = 0.000\nlearning rate 1.1: w after 20 steps = -112.013\ngradient at w=1: exact -4.0, finite difference -4.0000"
+  }
+ ],
+ "takeaways": [
+  "A loss turns 'how wrong' into one number; training minimises it.",
+  "Gradient descent steps downhill: w ← w − η × gradient.",
+  "The learning rate must be neither too small nor too large; momentum and Adam help.",
+  "Automatic differentiation computes exact gradients, including with respect to inputs."
+ ],
+ "quiz": [
+  {
+   "q": "Gradient descent moves the weights…",
+   "options": [
+    "Uphill",
+    "In the direction that reduces the loss fastest",
+    "Randomly",
+    "To zero"
+   ],
+   "answer": 1,
+   "explain": "Against the gradient."
+  },
+  {
+   "q": "A learning rate that is too large may…",
+   "options": [
+    "Converge faster always",
+    "Overshoot and diverge",
+    "Have no effect",
+    "Make the loss exactly zero"
+   ],
+   "answer": 1,
+   "explain": "Steps jump across the valley."
+  },
+  {
+   "q": "Momentum helps because it…",
+   "options": [
+    "Removes the need for gradients",
+    "Keeps part of the previous step, rolling past small bumps",
+    "Makes the loss convex",
+    "Adds more data"
+   ],
+   "answer": 1,
+   "explain": "Like a rolling ball."
+  },
+  {
+   "q": "Automatic differentiation computes…",
+   "options": [
+    "Approximate derivatives by finite differences",
+    "Exact derivatives by applying the chain rule",
+    "Integrals",
+    "Random numbers"
+   ],
+   "answer": 1,
+   "explain": "Chain rule, exactly."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Loss function",
+   "def": "A number measuring how wrong a model is; training minimises it."
+  },
+  {
+   "term": "Gradient",
+   "def": "The vector of derivatives of the loss with respect to each parameter."
+  },
+  {
+   "term": "Learning rate",
+   "def": "The step size of gradient descent."
+  },
+  {
+   "term": "Momentum",
+   "def": "Carrying over part of the previous update to smooth and speed up descent."
+  },
+  {
+   "term": "Automatic differentiation",
+   "def": "Computing exact derivatives of a program by applying the chain rule to its operations."
+  }
+ ],
+ "resources": [
+  {
+   "title": "Kingma and Ba (2015): Adam",
+   "url": "https://arxiv.org/abs/1412.6980",
+   "why": "The optimiser used in most SciML training."
+  },
+  {
+   "title": "Baydin et al. (2018): Automatic differentiation in machine learning: a survey",
+   "url": "https://www.jmlr.org/papers/v18/17-468.html",
+   "why": "How autodiff works, clearly explained."
+  },
+  {
+   "title": "Distill: Why momentum really works",
+   "url": "https://distill.pub/2017/momentum/",
+   "why": "Interactive explanation of momentum."
+  }
+ ]
+}

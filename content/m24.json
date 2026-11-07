@@ -1,0 +1,330 @@
+{
+ "id": "2.4",
+ "go": 2,
+ "slug": "discovering-equations",
+ "title": "Discovering equations from data: SINDy and neural ODEs",
+ "minutes": 50,
+ "tag": "Build",
+ "systems": [
+  "data",
+  "physics"
+ ],
+ "summary": "Instead of assuming the law, find it. SINDy fits a sparse combination of candidate terms; neural ODEs learn the right-hand side of a differential equation with a network.",
+ "outcomes": [
+  "explain sparse regression for equation discovery (SINDy)",
+  "build a candidate library and apply sequential thresholding",
+  "describe how noise and the threshold affect what is found",
+  "explain the idea of a neural ODE and when to prefer it"
+ ],
+ "narration_en": "So far we assumed we knew the law. Sometimes we do not. Equation discovery tries to find it from data. The SINDy method, short for sparse identification of nonlinear dynamics, by Brunton, Proctor and Kutz, rests on a simple observation: most physical laws contain only a few terms. So we measure the state, estimate its time derivatives, and build a library of candidate terms, such as a constant, x, v, x squared, x times v and x cubed. Then we fit the derivative as a combination of all candidates, set the small coefficients to zero, and refit, repeating until only a few terms remain. The result is a readable equation, not a black box. For a damped oscillator, SINDy recovers dv over dt equals minus four x minus zero point three v. Noise is the enemy, because differentiation amplifies it, so we smooth first and choose the threshold carefully. A neural ODE, by Chen and colleagues in 2018, takes the opposite approach: it learns the right-hand side with a network, which is flexible but not readable. In this module you will discover the oscillator's law and see when noise breaks it.",
+ "narration_ar": "افترضنا حتى الآن أننا نعرف القانون، لكننا أحياناً لا نعرفه. ويحاول اكتشاف المعادلات العثور عليه من البيانات. وتقوم طريقة SINDy، أي التحديد المتناثر للديناميكيات غير الخطية، التي قدمها برونتون وبروكتور وكوتز، على ملاحظة بسيطة: معظم القوانين الفيزيائية لا تحتوي إلا على حدود قليلة. فنقيس الحالة، ونقدّر مشتقاتها الزمنية، ونبني مكتبة من الحدود المرشحة، مثل الثابت وx وv وx تربيع وx مضروباً في v وx تكعيب. ثم نطابق المشتقة بتركيبة من كل المرشحات، ونجعل المعاملات الصغيرة أصفاراً، ثم نعيد المطابقة، ونكرر حتى لا يبقى إلا حدود قليلة. والنتيجة معادلة مقروءة لا صندوق أسود. ففي المذبذب المخمَّد تستعيد SINDy القاعدة: معدل تغير v يساوي سالب أربعة x ناقص 0.3 v. والضوضاء هي العدو، لأن الاشتقاق يضخمها، لذا ننعّم البيانات أولاً ونختار العتبة بعناية. أما المعادلة التفاضلية العصبية، التي قدمها تشين وزملاؤه عام 2018، فتسلك النهج المعاكس: تتعلم الطرف الأيمن من المعادلة بشبكة عصبية، وهذا مرن لكنه غير مقروء. ستكتشف في هذه الوحدة قانون المذبذب وترى متى تفسده الضوضاء.",
+ "diagram": {
+  "title": "SINDy in five steps",
+  "caption": "Measure, differentiate, build a library, regress sparsely, read the equation.",
+  "nodes": [
+   {
+    "id": "meas",
+    "label": "1. Measure",
+    "sub": "x(t), v(t)",
+    "x": 140,
+    "y": 90,
+    "w": 170,
+    "h": 64,
+    "sys": "data",
+    "detail": "Time series of the state, from sensors or simulation."
+   },
+   {
+    "id": "diff",
+    "label": "2. Differentiate",
+    "sub": "smooth, then dv/dt",
+    "x": 140,
+    "y": 260,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "Numerical derivatives amplify noise; smooth or use total-variation methods first."
+   },
+   {
+    "id": "lib",
+    "label": "3. Library Θ",
+    "sub": "1, x, v, x², xv, v², x³",
+    "x": 450,
+    "y": 90,
+    "w": 200,
+    "h": 64,
+    "sys": "physics",
+    "detail": "Candidate terms that might appear in the law. Physics knowledge guides the choice."
+   },
+   {
+    "id": "reg",
+    "label": "4. Sparse regression",
+    "sub": "fit, threshold, refit",
+    "x": 450,
+    "y": 260,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Least squares, then zero coefficients below a threshold λ and refit (STLSQ)."
+   },
+   {
+    "id": "eq",
+    "label": "5. Read the equation",
+    "sub": "dv/dt = −4x − 0.3v",
+    "x": 760,
+    "y": 175,
+    "w": 190,
+    "h": 64,
+    "sys": "physics",
+    "detail": "A short, interpretable law that can be checked, simulated and extrapolated."
+   },
+   {
+    "id": "node",
+    "label": "Alternative: neural ODE",
+    "sub": "dx/dt = network(x)",
+    "x": 450,
+    "y": 430,
+    "w": 210,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Learn the right-hand side with a network and integrate it with an ODE solver. Flexible, not readable."
+   }
+  ],
+  "edges": [
+   {
+    "from": "meas",
+    "to": "diff",
+    "label": ""
+   },
+   {
+    "from": "diff",
+    "to": "reg",
+    "label": "targets"
+   },
+   {
+    "from": "meas",
+    "to": "lib",
+    "label": "evaluate"
+   },
+   {
+    "from": "lib",
+    "to": "reg",
+    "label": "features"
+   },
+   {
+    "from": "reg",
+    "to": "eq",
+    "label": ""
+   },
+   {
+    "from": "meas",
+    "to": "node",
+    "label": "or"
+   }
+  ],
+  "tour": [
+   {
+    "focus": [
+     "meas",
+     "diff"
+    ],
+    "text": "Measure the state and estimate its derivatives, smoothing noise first.",
+    "edges": [
+     [
+      "meas",
+      "diff"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "lib"
+    ],
+    "text": "Build a library of candidate terms.",
+    "edges": [
+     [
+      "meas",
+      "lib"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "reg"
+    ],
+    "text": "Fit all terms, cut the small ones, refit.",
+    "edges": [
+     [
+      "diff",
+      "reg"
+     ],
+     [
+      "lib",
+      "reg"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "eq"
+    ],
+    "text": "What remains is a readable equation.",
+    "edges": [
+     [
+      "reg",
+      "eq"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "node"
+    ],
+    "text": "A neural ODE learns the right-hand side with a network instead.",
+    "edges": [
+     [
+      "meas",
+      "node"
+     ]
+    ]
+   }
+  ]
+ },
+ "sections": [
+  {
+   "heading": "The SINDy idea",
+   "html": "<p>Write the unknown law as a sparse combination of candidates: dv/dt = Θ(x, v) ξ, where Θ holds library terms as columns and ξ is mostly zero. Sparsity reflects the principle that physical laws are usually simple (parsimony). The method was introduced by Brunton, Proctor and Kutz (2016) and is available in the PySINDy library.</p>"
+  },
+  {
+   "heading": "Sequential thresholded least squares",
+   "html": "<p>Algorithm (STLSQ): (1) solve least squares for all terms; (2) set coefficients with |ξ| below a threshold λ to zero; (3) refit using only the remaining terms; (4) repeat until nothing changes. In the lab, with noise 0.01 and λ = 0.1, it finds −4.00 x − 0.30 v exactly. With λ = 0.5 it deletes the damping term (−3.89 x); with λ = 0.01 junk terms such as 0.02 x³ survive.</p>"
+  },
+  {
+   "heading": "Noise and derivatives",
+   "html": "<p>Differentiation turns small noise into large errors, because it divides differences by a small Δt. Defences: smooth the data before differencing (as in the lab), use total-variation regularised derivatives, or use the weak (integral) form of SINDy, which avoids derivatives altogether. Always check a discovered law by simulating it and comparing with held-out data.</p>"
+  },
+  {
+   "heading": "Neural ODEs",
+   "html": "<p>A neural ODE (Chen et al. 2018) models dx/dt = f<sub>θ</sub>(x, t) with a network and trains it by integrating with an ODE solver and comparing trajectories with data. It handles irregular sampling and complex dynamics, but the learned f is a black box. Universal differential equations (Rackauckas et al. 2020) combine the two: known physics plus a small network for the unknown part, which SINDy can then turn into a formula.</p>"
+  }
+ ],
+ "callouts": [
+  {
+   "after": 1,
+   "kind": "try",
+   "title": "Try it",
+   "html": "<p>Raise the noise to 0.05. Can you find a threshold that still recovers exactly two terms?</p>"
+  },
+  {
+   "after": 3,
+   "kind": "research",
+   "title": "Research angle",
+   "html": "<p>Discovering traffic or crowd dynamics from trajectory data with SINDy is an active area: can we find car-following laws directly from vehicle trajectories?</p>"
+  }
+ ],
+ "explorer": {
+  "widget": "sindy",
+  "intro": "Noisy measurements of a damped oscillator. SINDy searches seven candidate terms for the law of dv/dt.",
+  "predict": "With a very low threshold, will SINDy find a short or a long equation?"
+ },
+ "code": [
+  {
+   "title": "SINDy from scratch",
+   "lang": "python",
+   "file": "labs/go2/m24_sindy.py",
+   "runnable": true,
+   "explain": "Simulate, add noise, smooth, differentiate, and run sequential thresholded least squares.",
+   "expected": "noise 0.001, threshold 0.1: dv/dt = -4.00 x -0.30 v\nnoise 0.010, threshold 0.1: dv/dt = -4.00 x -0.30 v\nnoise 0.050, threshold 0.1: dv/dt = -4.02 x -0.29 v\nnoise 0.050, threshold 0.5: dv/dt = -3.89 x\ntrue law:                       dv/dt = -4.00 x -0.30 v"
+  }
+ ],
+ "takeaways": [
+  "SINDy finds a law as a sparse combination of candidate terms.",
+  "Sequential thresholded least squares fits, cuts small terms and refits.",
+  "Noise and the threshold decide whether the right terms survive.",
+  "Neural ODEs learn the right-hand side with a network; universal DEs combine both."
+ ],
+ "quiz": [
+  {
+   "q": "SINDy assumes that laws are…",
+   "options": [
+    "Long and complex",
+    "Sparse: made of a few terms",
+    "Linear only",
+    "Random"
+   ],
+   "answer": 1,
+   "explain": "Parsimony."
+  },
+  {
+   "q": "A threshold that is too high will…",
+   "options": [
+    "Keep junk terms",
+    "Delete real terms",
+    "Have no effect",
+    "Add noise"
+   ],
+   "answer": 1,
+   "explain": "Real small terms vanish."
+  },
+  {
+   "q": "Why smooth data before differentiating?",
+   "options": [
+    "To speed up code",
+    "Differentiation amplifies noise",
+    "SINDy requires it by law",
+    "To add terms"
+   ],
+   "answer": 1,
+   "explain": "Noise blows up."
+  },
+  {
+   "q": "A neural ODE learns…",
+   "options": [
+    "A list of words",
+    "The right-hand side dx/dt with a network",
+    "Only initial conditions",
+    "The time step"
+   ],
+   "answer": 1,
+   "explain": "f in dx/dt = f(x)."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "SINDy",
+   "def": "Sparse Identification of Nonlinear Dynamics: discovering equations by sparse regression on a library of terms."
+  },
+  {
+   "term": "Candidate library",
+   "def": "The set of possible terms an equation might contain."
+  },
+  {
+   "term": "Sparse regression",
+   "def": "Regression that drives most coefficients to exactly zero."
+  },
+  {
+   "term": "Neural ODE",
+   "def": "A differential equation whose right-hand side is a neural network."
+  },
+  {
+   "term": "Universal differential equation",
+   "def": "A model combining known physics with a neural network for unknown terms."
+  }
+ ],
+ "resources": [
+  {
+   "title": "Brunton, Proctor and Kutz (2016): Discovering governing equations from data",
+   "url": "https://doi.org/10.1073/pnas.1517384113",
+   "why": "The SINDy paper."
+  },
+  {
+   "title": "PySINDy documentation",
+   "url": "https://pysindy.readthedocs.io/",
+   "why": "Python package with tutorials."
+  },
+  {
+   "title": "Chen et al. (2018): Neural ordinary differential equations",
+   "url": "https://arxiv.org/abs/1806.07366",
+   "why": "The neural ODE paper."
+  }
+ ]
+}

@@ -1,0 +1,329 @@
+{
+ "id": "1.8",
+ "go": 1,
+ "slug": "physical-ai-sense-decide-act",
+ "title": "Physical AI: sense, estimate, decide, act",
+ "minutes": 40,
+ "tag": "Physical AI",
+ "systems": [
+  "apply",
+  "data"
+ ],
+ "summary": "Physical AI closes a loop: sensors measure the world, filters estimate its state, models predict, controllers act, and the world responds. Physics-based estimation such as the Kalman filter is the foundation.",
+ "outcomes": [
+  "describe the sense–estimate–decide–act loop of Physical AI",
+  "explain how a Kalman filter blends a physics prediction with noisy measurements",
+  "tune the filter's trust in model and sensor",
+  "explain what a digital twin is and why safety matters for Physical AI"
+ ],
+ "narration_en": "Physical AI is artificial intelligence with a body. An automated vehicle, a delivery robot or an adaptive traffic signal must repeat a loop many times a second: sense the world, estimate its true state, decide what to do, and act. Sensors are noisy. GPS jumps by several metres, radar misses targets, cameras are fooled by glare. So the first job is estimation. The Kalman filter, invented in 1960 and used in the Apollo missions, is the classic tool. It predicts where the vehicle should be using physics, position plus speed times time, and then corrects that prediction with the measurement, weighting each by how much it trusts it. If it trusts the model too much, it lags behind real changes. If it trusts the sensor too much, it just follows the noise. The same predict-and-correct idea powers digital twins, which keep a model of a road or a city in step with live data. Because Physical AI acts in the real world, safety, uncertainty and physics constraints are essential. In this module you will tune a Kalman filter tracking a car.",
+ "narration_ar": "الذكاء الاصطناعي المادي هو ذكاء اصطناعي له جسد. فالمركبة الآلية أو روبوت التوصيل أو إشارة المرور التكيفية يجب أن تكرر حلقة مرات كثيرة في الثانية: تستشعر العالم، وتقدّر حالته الحقيقية، وتقرر ما تفعل، ثم تتصرف. وأجهزة الاستشعار مشوشة: يقفز نظام تحديد المواقع عدة أمتار، ويفوّت الرادار أهدافاً، وتنخدع الكاميرات بالوهج. لذا فالمهمة الأولى هي التقدير. ومرشّح كالمان، الذي اختُرع عام 1960 واستُخدم في رحلات أبولو، هو الأداة الكلاسيكية. فهو يتنبأ بموضع المركبة باستخدام الفيزياء، أي الموضع مضافاً إليه السرعة مضروبة في الزمن، ثم يصحح هذا التنبؤ بالقياس، مع ترجيح كل منهما بمقدار الثقة فيه. فإذا وثق بالنموذج أكثر من اللازم تأخر عن التغيرات الحقيقية، وإذا وثق بالمستشعر أكثر من اللازم تبع الضوضاء. والفكرة نفسها، التنبؤ ثم التصحيح، تشغّل التوائم الرقمية التي تُبقي نموذج طريق أو مدينة متزامناً مع البيانات الحية. ولأن الذكاء الاصطناعي المادي يتصرف في العالم الحقيقي، فإن السلامة وعدم اليقين والقيود الفيزيائية أمور أساسية. ستضبط في هذه الوحدة مرشّح كالمان يتتبع سيارة.",
+ "diagram": {
+  "title": "The Physical AI loop",
+  "caption": "Sense, estimate, decide, act; the world responds and the loop repeats many times a second.",
+  "nodes": [
+   {
+    "id": "sen",
+    "label": "Sense",
+    "sub": "GPS, radar, cameras",
+    "x": 140,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "data",
+    "detail": "Sensors measure the world, with noise, gaps and occasional failures."
+   },
+   {
+    "id": "est",
+    "label": "Estimate",
+    "sub": "Kalman filter, fusion",
+    "x": 450,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "physics",
+    "detail": "Combine a physics prediction with measurements to estimate the true state (position, speed, queue length)."
+   },
+   {
+    "id": "dec",
+    "label": "Decide",
+    "sub": "plan, control, learn",
+    "x": 760,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Choose an action: brake, steer, change a signal. Learned policies and model-based control both live here."
+   },
+   {
+    "id": "act",
+    "label": "Act",
+    "sub": "brake, steer, signal",
+    "x": 760,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "apply",
+    "detail": "Actuators change the physical world: physics limits how fast this can happen."
+   },
+   {
+    "id": "wld",
+    "label": "The world",
+    "sub": "vehicles, roads, people",
+    "x": 450,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "system",
+    "detail": "Responds to actions; other agents act too. Its physics links one moment to the next."
+   },
+   {
+    "id": "safe",
+    "label": "Safety layer",
+    "sub": "constraints, uncertainty",
+    "x": 140,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "Checks that actions respect physical limits and that estimates are certain enough to act on."
+   }
+  ],
+  "edges": [
+   {
+    "from": "sen",
+    "to": "est",
+    "label": "measurements"
+   },
+   {
+    "from": "est",
+    "to": "dec",
+    "label": "state"
+   },
+   {
+    "from": "dec",
+    "to": "act",
+    "label": ""
+   },
+   {
+    "from": "act",
+    "to": "wld",
+    "label": ""
+   },
+   {
+    "from": "wld",
+    "to": "sen",
+    "label": "observed"
+   },
+   {
+    "from": "safe",
+    "to": "dec",
+    "label": "limits",
+    "sys": "risk"
+   }
+  ],
+  "tour": [
+   {
+    "focus": [
+     "sen"
+    ],
+    "text": "Sensors measure the world, imperfectly."
+   },
+   {
+    "focus": [
+     "est"
+    ],
+    "text": "Estimation blends physics predictions with measurements.",
+    "edges": [
+     [
+      "sen",
+      "est"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "dec",
+     "act"
+    ],
+    "text": "A decision is made and carried out.",
+    "edges": [
+     [
+      "est",
+      "dec"
+     ],
+     [
+      "dec",
+      "act"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "wld"
+    ],
+    "text": "The world responds and is measured again.",
+    "edges": [
+     [
+      "act",
+      "wld"
+     ],
+     [
+      "wld",
+      "sen"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "safe"
+    ],
+    "text": "A safety layer keeps actions within physical and uncertainty limits.",
+    "edges": [
+     [
+      "safe",
+      "dec"
+     ]
+    ]
+   }
+  ]
+ },
+ "sections": [
+  {
+   "heading": "The loop",
+   "html": "<p>Every Physical AI system runs a loop: <b>sense → estimate → decide → act</b>. An adaptive cruise control does this about 10 to 100 times a second: radar measures the gap, a filter estimates the gap and relative speed, a controller chooses an acceleration, the engine and brakes apply it, and the gap changes.</p>"
+  },
+  {
+   "heading": "The Kalman filter",
+   "html": "<p>The Kalman filter (Kalman 1960) alternates two steps. <b>Predict</b>: use physics, x<sub>new</sub> = x + v Δt, and grow the uncertainty. <b>Update</b>: compare with the measurement and move the estimate towards it by the Kalman gain K, which is large when the sensor is trusted and small when the model is trusted. In the explorer, with GPS noise of 8 m, a well-tuned filter cuts the error to about 4.7 m; trusting the model too much (tiny q) makes it lag (7.7 m).</p>"
+  },
+  {
+   "heading": "Digital twins",
+   "html": "<p>A <b>digital twin</b> is a model kept continuously in step with a real system by data, using the same predict-and-correct idea at larger scale. A traffic digital twin of a corridor runs a traffic-flow model and corrects it with detector and probe data, so operators can see the current state, forecast the next minutes and test actions safely. You will build one in module 3.7.</p>"
+  },
+  {
+   "heading": "Safety and trust",
+   "html": "<p>A wrong prediction in Physical AI can cause a crash. Systems therefore need uncertainty estimates (how sure is the estimate?), hard physical constraints (a car cannot decelerate faster than its tyres allow), fallbacks when sensors fail, and testing in simulation before the road. Standards such as ISO 26262 and ISO 21448 (SOTIF) cover functional safety of automated vehicles.</p>"
+  }
+ ],
+ "callouts": [
+  {
+   "after": 1,
+   "kind": "try",
+   "title": "Try it",
+   "html": "<p>Set q very small, then very large. Which setting lags behind the car, and which just follows the GPS noise?</p>"
+  },
+  {
+   "after": 3,
+   "kind": "research",
+   "title": "Research angle",
+   "html": "<p>Combining learned perception (neural networks on camera images) with physics-based filtering and control is a major research direction for automated vehicles and robots.</p>"
+  }
+ ],
+ "explorer": {
+  "widget": "kalman",
+  "intro": "A car drives along a road; GPS readings are noisy. A Kalman filter estimates its true position.",
+  "predict": "Can a filter beat the GPS readings it is built from?"
+ },
+ "code": [
+  {
+   "title": "A one-dimensional Kalman filter",
+   "lang": "python",
+   "runnable": true,
+   "source": "import numpy as np\nrng = np.random.default_rng(51)\nT, sd, q = 60, 8.0, 0.5\nx, v, truth, z = 0.0, 15.0, [], []\nfor t in range(T + 1):\n    truth.append(x); z.append(x + sd*rng.standard_normal())\n    a = 0.6*rng.standard_normal(); x += v + 0.5*a; v += a\nF = np.array([[1, 1], [0, 1]]); H = np.array([[1, 0]])\nQ = q*np.array([[0.25, 0.5], [0.5, 1]]); R = sd**2\nX = np.array([z[0], 12.0]); P = np.diag([100.0, 25.0]); est = []\nfor t in range(T + 1):\n    if t: X = F @ X; P = F @ P @ F.T + Q          # predict with physics\n    K = P @ H.T / (H @ P @ H.T + R)                 # Kalman gain\n    X = X + (K * (z[t] - H @ X)).ravel(); P = (np.eye(2) - K @ H) @ P   # correct\n    est.append(X[0])\nrm = lambda a: np.sqrt(np.mean((np.array(a) - np.array(truth))**2))\nprint(f'GPS error {rm(z):.1f} m, Kalman error {rm(est):.1f} m')",
+   "explain": "Predict with physics, correct with the measurement, weighted by the Kalman gain.",
+   "expected": "GPS error 8.2 m, Kalman error 5.0 m"
+  }
+ ],
+ "takeaways": [
+  "Physical AI repeats a sense–estimate–decide–act loop.",
+  "The Kalman filter blends a physics prediction with noisy measurements.",
+  "Tuning sets the trust in model versus sensor: too much model lags, too much sensor follows noise.",
+  "Digital twins and safety layers extend the same ideas to whole systems."
+ ],
+ "quiz": [
+  {
+   "q": "The Kalman filter's two steps are…",
+   "options": [
+    "Train and test",
+    "Predict with a model, then correct with a measurement",
+    "Sense and act",
+    "Encode and decode"
+   ],
+   "answer": 1,
+   "explain": "Predict, update."
+  },
+  {
+   "q": "If the filter trusts its model too much, the estimate…",
+   "options": [
+    "Follows every noisy reading",
+    "Lags behind real changes",
+    "Becomes perfect",
+    "Diverges to infinity always"
+   ],
+   "answer": 1,
+   "explain": "It ignores the data."
+  },
+  {
+   "q": "A digital twin is…",
+   "options": [
+    "A backup server",
+    "A model kept in step with a real system by live data",
+    "A second vehicle",
+    "A video recording"
+   ],
+   "answer": 1,
+   "explain": "Predict and correct at scale."
+  },
+  {
+   "q": "Why is safety central to Physical AI?",
+   "options": [
+    "It runs slowly",
+    "Its actions have physical consequences",
+    "It never uses data",
+    "Regulations forbid AI"
+   ],
+   "answer": 1,
+   "explain": "Mistakes cause harm."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Physical AI",
+   "def": "AI that perceives and acts in the physical world."
+  },
+  {
+   "term": "State estimation",
+   "def": "Inferring the true state of a system from noisy measurements and a model."
+  },
+  {
+   "term": "Kalman filter",
+   "def": "An algorithm that optimally blends model predictions and measurements for linear systems with Gaussian noise."
+  },
+  {
+   "term": "Kalman gain",
+   "def": "The weight given to a new measurement relative to the prediction."
+  },
+  {
+   "term": "Digital twin",
+   "def": "A model continuously updated with data from the real system it represents."
+  }
+ ],
+ "resources": [
+  {
+   "title": "Kalman (1960): A new approach to linear filtering and prediction problems",
+   "url": "https://doi.org/10.1115/1.3662552",
+   "why": "The original paper."
+  },
+  {
+   "title": "Labbe: Kalman and Bayesian Filters in Python (free)",
+   "url": "https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python",
+   "why": "Interactive notebooks for beginners."
+  },
+  {
+   "title": "NVIDIA: What is Physical AI?",
+   "url": "https://www.nvidia.com/en-us/glossary/generative-physical-ai/",
+   "why": "An industry overview of the term."
+  }
+ ]
+}

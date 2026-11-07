@@ -1,0 +1,322 @@
+{
+ "id": "1.2",
+ "go": 1,
+ "slug": "differential-equations",
+ "title": "Differential equations: the language of physics",
+ "minutes": 40,
+ "tag": "Foundations",
+ "systems": [
+  "physics",
+  "system"
+ ],
+ "summary": "A differential equation says how something changes. Solving it, with a formula or step by step with methods such as Euler's, predicts how the system evolves. Step size controls accuracy.",
+ "outcomes": [
+  "read a simple ordinary differential equation as a rule for change",
+  "solve decay and growth equations step by step with Euler's method",
+  "explain how the time step affects accuracy and stability",
+  "recognise ODEs and PDEs in traffic, energy and climate models"
+ ],
+ "narration_en": "Most laws of physics are written as differential equations. A differential equation does not say what a quantity is; it says how fast it changes. For example, a pollutant that decays at a rate proportional to how much is left follows dy over dt equals minus k times y. A queue that grows when arrivals beat departures follows a similar rule. To predict the future, we solve the equation. Sometimes there is a formula, such as an exponential decay. Usually there is not, so we step forward in time: take the current value, compute the rate of change, and move a small step. This is Euler's method, the simplest numerical solver. Small steps are accurate but slow; big steps are fast but wrong, and for some equations they even become unstable. Equations with one variable changing in time are ordinary differential equations, or ODEs. Equations that change in time and space, such as traffic waves or heat, are partial differential equations, or PDEs. In this module you will solve three equations step by step.",
+ "narration_ar": "تُكتب معظم قوانين الفيزياء على شكل معادلات تفاضلية. والمعادلة التفاضلية لا تقول ما قيمة الكمية، بل تقول بأي سرعة تتغير. فمثلاً الملوِّث الذي يتحلل بمعدل يتناسب مع ما تبقى منه يتبع القاعدة: معدل تغير y يساوي سالب k مضروباً في y. والطابور الذي يطول حين تفوق الأعداد الواصلة الأعداد المغادرة يتبع قاعدة مشابهة. وللتنبؤ بالمستقبل نحل المعادلة. أحياناً توجد صيغة جاهزة، كالتحلل الأسي، لكن في الغالب لا توجد، فنتقدم في الزمن خطوة خطوة: نأخذ القيمة الحالية، ونحسب معدل التغير، ونتقدم خطوة صغيرة. هذه طريقة أويلر، أبسط طرق الحل العددي. الخطوات الصغيرة دقيقة لكنها بطيئة، والكبيرة سريعة لكنها خاطئة، بل تصبح في بعض المعادلات غير مستقرة. والمعادلات التي يتغير فيها متغير واحد مع الزمن هي معادلات تفاضلية عادية، أما التي تتغير في الزمن والمكان معاً، كموجات المرور أو الحرارة، فهي معادلات تفاضلية جزئية. ستحل في هذه الوحدة ثلاث معادلات خطوة خطوة.",
+ "diagram": {
+  "title": "From a rule for change to a prediction",
+  "caption": "An equation gives the rate of change; a solver turns it into a trajectory; data check it.",
+  "nodes": [
+   {
+    "id": "law",
+    "label": "Law of change",
+    "sub": "dy/dt = f(y, t)",
+    "x": 140,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "physics",
+    "detail": "The equation: how fast y changes, given its current value. Decay: dy/dt = −k y. Growth with a limit: dy/dt = k y (1 − y)."
+   },
+   {
+    "id": "ic",
+    "label": "Starting value",
+    "sub": "y at t = 0",
+    "x": 140,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "data",
+    "detail": "An initial condition. The same law gives different futures from different starts."
+   },
+   {
+    "id": "sol",
+    "label": "Solver",
+    "sub": "Euler, Runge–Kutta",
+    "x": 450,
+    "y": 220,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Step forward: y_next = y + Δt × f(y). Better solvers (Runge–Kutta) sample the slope several times per step."
+   },
+   {
+    "id": "traj",
+    "label": "Trajectory",
+    "sub": "y over time",
+    "x": 760,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "system",
+    "detail": "The predicted path of the system over time."
+   },
+   {
+    "id": "dt",
+    "label": "Step size Δt",
+    "sub": "accuracy vs cost",
+    "x": 450,
+    "y": 440,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "Smaller steps: more accurate, more work. Too large: errors grow, and some schemes blow up (instability)."
+   },
+   {
+    "id": "pde",
+    "label": "PDEs",
+    "sub": "change in space and time",
+    "x": 760,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "physics",
+    "detail": "Partial differential equations: traffic density, heat, air pollution and fluid flow change along a road or through space as well as in time."
+   }
+  ],
+  "edges": [
+   {
+    "from": "law",
+    "to": "sol",
+    "label": ""
+   },
+   {
+    "from": "ic",
+    "to": "sol",
+    "label": ""
+   },
+   {
+    "from": "sol",
+    "to": "traj",
+    "label": "steps"
+   },
+   {
+    "from": "dt",
+    "to": "sol",
+    "label": "controls",
+    "sys": "risk"
+   },
+   {
+    "from": "law",
+    "to": "pde",
+    "label": "extends to"
+   }
+  ],
+  "tour": [
+   {
+    "focus": [
+     "law"
+    ],
+    "text": "The equation is a rule for change, not a formula for the answer."
+   },
+   {
+    "focus": [
+     "ic",
+     "law",
+     "sol"
+    ],
+    "text": "With a starting value, a solver can follow the rule.",
+    "edges": [
+     [
+      "law",
+      "sol"
+     ],
+     [
+      "ic",
+      "sol"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "sol",
+     "traj"
+    ],
+    "text": "Step by step it builds the trajectory.",
+    "edges": [
+     [
+      "sol",
+      "traj"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "dt"
+    ],
+    "text": "The step size trades accuracy against cost.",
+    "edges": [
+     [
+      "dt",
+      "sol"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "pde"
+    ],
+    "text": "When things change in space too, we get partial differential equations.",
+    "edges": [
+     [
+      "law",
+      "pde"
+     ]
+    ]
+   }
+  ]
+ },
+ "sections": [
+  {
+   "heading": "A rule for change",
+   "html": "<p>An ordinary differential equation (ODE) gives the rate of change of a quantity as a function of the quantity itself. Three examples you will use:</p><ul><li><b>Decay</b>: dy/dt = −k y. Each second a fixed fraction disappears (pollutants, radioactivity, fading signals).</li><li><b>Logistic growth</b>: dy/dt = k y (1 − y). Growth that slows near a limit (adoption of electric cars).</li><li><b>Oscillator</b>: d²x/dt² = −ω² x. A spring, a swaying bridge, a car suspension.</li></ul>"
+  },
+  {
+   "heading": "Euler's method by hand",
+   "html": "<p>Take the decay law with k = 0.5 and y(0) = 1, step Δt = 0.5 s:</p><div class=\"eq\">y₁ = y₀ + Δt × (−k y₀) = 1 − 0.5 × 0.5 × 1 = 0.75</div><p>Then y₂ = 0.75 − 0.25 × 0.75 = 0.5625. The exact answer at t = 1 s is e<sup>−0.5</sup> ≈ 0.607, so the error after two steps is about 0.045. Halve the step and the error roughly halves: Euler's method is <b>first-order accurate</b>.</p>"
+  },
+  {
+   "heading": "Stability and better solvers",
+   "html": "<p>For the oscillator, explicit Euler adds a little energy every step, so the swing grows forever. Large steps make things worse, and for stiff problems the solution can explode. Higher-order methods such as Runge–Kutta (RK4) sample the slope four times per step and are far more accurate for the same work; adaptive solvers choose the step size automatically. Every SciML method in this course rests on solvers like these.</p>"
+  },
+  {
+   "heading": "PDEs in transport",
+   "html": "<p>When a quantity varies along a road or through space, we get a partial differential equation. The <b>LWR traffic model</b> (Lighthill, Whitham and Richards) says vehicles are conserved: ∂ρ/∂t + ∂(ρv)/∂x = 0. The heat equation, air-pollution dispersion and the shallow-water equations behind flood models are PDEs too. You will solve one in Go 2 and use LWR in Go 3.</p>"
+  }
+ ],
+ "callouts": [
+  {
+   "after": 1,
+   "kind": "try",
+   "title": "Try it",
+   "html": "<p>In the explorer, choose the oscillator and increase Δt. Watch Euler's swing grow. Then make Δt small: does the growth vanish, or just slow down?</p>"
+  },
+  {
+   "after": 2,
+   "kind": "trap",
+   "title": "Common trap",
+   "html": "<p>A solver that 'runs' is not necessarily right. Always halve the step and check that the answer barely changes.</p>"
+  }
+ ],
+ "explorer": {
+  "widget": "ode",
+  "intro": "Solve three equations with Euler's method and compare with the exact answer.",
+  "predict": "If you halve the time step, what happens to the error?"
+ },
+ "code": [
+  {
+   "title": "Euler's method for decay",
+   "lang": "python",
+   "runnable": true,
+   "source": "import numpy as np\nk, dt, T = 0.5, 0.5, 10\ny, t = 1.0, 0.0\nwhile t < T - 1e-9:\n    y += dt * (-k * y)\n    t += dt\nprint(f'Euler y(10) = {y:.5f}, exact = {np.exp(-k*T):.5f}')\nfor dt in [0.5, 0.25, 0.125]:\n    y = 1.0\n    for _ in range(int(round(T/dt))):\n        y += dt * (-k * y)\n    print(f'dt = {dt:5.3f}: error {abs(y - np.exp(-k*T)):.2e}')",
+   "explain": "The error roughly halves when the step halves: first-order accuracy.",
+   "expected": "Euler y(10) = 0.00317, exact = 0.00674\ndt = 0.500: error 3.57e-03\ndt = 0.250: error 1.95e-03\ndt = 0.125: error 1.01e-03"
+  }
+ ],
+ "takeaways": [
+  "A differential equation is a rule for change.",
+  "Euler's method follows the rule in small steps: y + Δt × slope.",
+  "Smaller steps are more accurate; large steps can be unstable.",
+  "PDEs describe change in space and time, such as traffic waves and heat."
+ ],
+ "quiz": [
+  {
+   "q": "dy/dt = −k y describes…",
+   "options": [
+    "Steady growth",
+    "Exponential decay",
+    "An oscillation",
+    "A constant"
+   ],
+   "answer": 1,
+   "explain": "Each moment a fixed fraction disappears."
+  },
+  {
+   "q": "One Euler step computes…",
+   "options": [
+    "y + Δt × slope",
+    "y × Δt",
+    "The exact solution",
+    "y − slope"
+   ],
+   "answer": 0,
+   "explain": "Follow the slope for a small step."
+  },
+  {
+   "q": "Halving the time step in Euler's method roughly…",
+   "options": [
+    "Doubles the error",
+    "Halves the error",
+    "Leaves the error unchanged",
+    "Removes all error"
+   ],
+   "answer": 1,
+   "explain": "It is first-order accurate."
+  },
+  {
+   "q": "The LWR traffic model is a…",
+   "options": [
+    "ODE",
+    "PDE",
+    "Neural network",
+    "Statistical test"
+   ],
+   "answer": 1,
+   "explain": "Density changes in space and time."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Ordinary differential equation (ODE)",
+   "def": "An equation for how a quantity changes with one variable, usually time."
+  },
+  {
+   "term": "Partial differential equation (PDE)",
+   "def": "An equation for how a quantity changes in more than one variable, such as space and time."
+  },
+  {
+   "term": "Euler's method",
+   "def": "The simplest step-by-step solver: new value = old value + step × rate."
+  },
+  {
+   "term": "Time step",
+   "def": "The size of each step a solver takes."
+  },
+  {
+   "term": "Initial condition",
+   "def": "The value of the quantity at the start."
+  }
+ ],
+ "resources": [
+  {
+   "title": "3Blue1Brown: Differential equations, a tourist's guide",
+   "url": "https://www.3blue1brown.com/lessons/differential-equations",
+   "why": "A beautiful visual introduction."
+  },
+  {
+   "title": "Strang: Differential Equations and Linear Algebra (MIT OpenCourseWare)",
+   "url": "https://ocw.mit.edu/courses/res-18-009-learn-differential-equations-up-close-with-gilbert-strang-and-cleve-moler-fall-2015/",
+   "why": "Short videos with Cleve Moler on solvers."
+  },
+  {
+   "title": "Lighthill and Whitham (1955): On kinematic waves II",
+   "url": "https://doi.org/10.1098/rspa.1955.0089",
+   "why": "The origin of the LWR traffic model."
+  }
+ ]
+}

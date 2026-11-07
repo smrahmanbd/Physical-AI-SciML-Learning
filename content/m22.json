@@ -1,0 +1,348 @@
+{
+ "id": "2.2",
+ "go": 2,
+ "slug": "build-a-pinn",
+ "title": "Build a physics-informed neural network, step by step",
+ "minutes": 55,
+ "tag": "Build",
+ "systems": [
+  "learn",
+  "physics"
+ ],
+ "summary": "Build a PINN for an ODE from scratch: define the network, compute the residual by automatic differentiation, assemble the loss, train with Adam, watch both loss terms, and solve an inverse problem.",
+ "outcomes": [
+  "implement a PINN for a first-order ODE in NumPy and in PyTorch",
+  "compute the physics residual with automatic differentiation",
+  "monitor data and physics losses to diagnose training",
+  "estimate an unknown parameter (inverse problem) with a PINN"
+ ],
+ "narration_en": "Now we build a physics-informed neural network ourselves, step by step. Our problem: a quantity decays as dy over dt equals minus k y, we have six noisy measurements in the first second, and we want the whole curve to five seconds. Step one, define the network: one or two hidden layers of tanh neurons mapping time to y. Step two, choose collocation points, say forty times spread over zero to five seconds. Step three, compute the residual: the network's derivative with respect to time plus k times its output. In PyTorch, one call to autograd gives the derivative. Step four, build the loss: data error, plus the physics residual, plus the initial condition. Step five, train with the Adam optimiser and plot both loss terms; if one stays high, rebalance. Step six, the payoff: make k itself a trainable parameter, and the PINN discovers the decay rate from the data. Our NumPy version, with hand-derived gradients, recovers k as 0.798 when the true value is 0.8. In the explorer you will watch the two losses fall during training.",
+ "narration_ar": "سنبني الآن بأنفسنا شبكة عصبية مستنيرة بالفيزياء، خطوة خطوة. مسألتنا: كمية تتحلل وفق القاعدة: معدل تغير y يساوي سالب k مضروباً في y، ولدينا ست قياسات مشوشة في الثانية الأولى، ونريد المنحنى كاملاً حتى خمس ثوانٍ. الخطوة الأولى: نعرّف الشبكة، طبقة أو طبقتين خفيتين من عصبونات الظل الزائدي تحوّل الزمن إلى y. الخطوة الثانية: نختار نقاط التجميع، ولتكن أربعين لحظة موزعة من الصفر إلى خمس ثوانٍ. الخطوة الثالثة: نحسب البقية، أي مشتقة الشبكة بالنسبة إلى الزمن مضافاً إليها k مضروباً في مخرجها. وفي PyTorch يعطي استدعاء واحد لـ autograd هذه المشتقة. الخطوة الرابعة: نبني دالة الخسارة: خطأ البيانات، مضافاً إليه بقية الفيزياء، والشرط الابتدائي. الخطوة الخامسة: ندرّب بخوارزمية Adam ونرسم حدّي الخسارة، فإذا بقي أحدهما مرتفعاً أعدنا الموازنة. الخطوة السادسة، وهي الثمرة: نجعل k نفسه معاملاً قابلاً للتدريب، فتكتشف الشبكة معدل التحلل من البيانات. ونسختنا المكتوبة بـ NumPy، بتدرجات مشتقة يدوياً، تستعيد k بقيمة 0.798 بينما القيمة الحقيقية 0.8. ستشاهد في المستكشف الخسارتين تنخفضان أثناء التدريب.",
+ "diagram": {
+  "title": "Six steps to a working PINN",
+  "caption": "Network, collocation points, residual by autodiff, composite loss, training, and the inverse problem.",
+  "nodes": [
+   {
+    "id": "net",
+    "label": "1. Network",
+    "sub": "t → ŷ(t), tanh layers",
+    "x": 140,
+    "y": 90,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "A small MLP, e.g. 1 → 32 → 32 → 1 with tanh. Smooth activations so derivatives exist."
+   },
+   {
+    "id": "col",
+    "label": "2. Collocation points",
+    "sub": "40 times over 0–5 s",
+    "x": 140,
+    "y": 260,
+    "w": 170,
+    "h": 64,
+    "sys": "physics",
+    "detail": "Where the law is enforced. Can be fixed or resampled each iteration."
+   },
+   {
+    "id": "res",
+    "label": "3. Residual by autodiff",
+    "sub": "dŷ/dt + k ŷ",
+    "x": 450,
+    "y": 90,
+    "w": 170,
+    "h": 64,
+    "sys": "physics",
+    "detail": "torch.autograd.grad(ŷ, t, create_graph=True) gives dŷ/dt; the residual should be zero."
+   },
+   {
+    "id": "loss",
+    "label": "4. Composite loss",
+    "sub": "data + physics + initial",
+    "x": 450,
+    "y": 260,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "L = L_data + λ L_phys + L_ic. Initial and boundary conditions are extra terms."
+   },
+   {
+    "id": "adam",
+    "label": "5. Train with Adam",
+    "sub": "watch both losses",
+    "x": 760,
+    "y": 90,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Learning rate around 1e-3 for networks. Plot data and physics losses on a log scale."
+   },
+   {
+    "id": "inv",
+    "label": "6. Inverse problem",
+    "sub": "learn k from data",
+    "x": 760,
+    "y": 260,
+    "w": 170,
+    "h": 64,
+    "sys": "data",
+    "detail": "Declare k a trainable parameter: the PINN fits the data and finds the k that makes the law hold."
+   },
+   {
+    "id": "chk",
+    "label": "Check",
+    "sub": "error beyond the data",
+    "x": 450,
+    "y": 430,
+    "w": 170,
+    "h": 64,
+    "sys": "system",
+    "detail": "Compare with the exact solution e^(−kt) where you have no measurements."
+   }
+  ],
+  "edges": [
+   {
+    "from": "net",
+    "to": "res",
+    "label": ""
+   },
+   {
+    "from": "col",
+    "to": "res",
+    "label": "evaluate at"
+   },
+   {
+    "from": "res",
+    "to": "loss",
+    "label": ""
+   },
+   {
+    "from": "loss",
+    "to": "adam",
+    "label": "minimise"
+   },
+   {
+    "from": "adam",
+    "to": "inv",
+    "label": "also learns k"
+   },
+   {
+    "from": "adam",
+    "to": "chk",
+    "label": ""
+   }
+  ],
+  "tour": [
+   {
+    "focus": [
+     "net",
+     "col"
+    ],
+    "text": "Define a smooth network and choose where to enforce the law."
+   },
+   {
+    "focus": [
+     "res"
+    ],
+    "text": "Automatic differentiation gives the residual dŷ/dt + kŷ.",
+    "edges": [
+     [
+      "net",
+      "res"
+     ],
+     [
+      "col",
+      "res"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "loss"
+    ],
+    "text": "Add data, physics and initial-condition terms.",
+    "edges": [
+     [
+      "res",
+      "loss"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "adam"
+    ],
+    "text": "Train with Adam and watch both loss terms.",
+    "edges": [
+     [
+      "loss",
+      "adam"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "inv",
+     "chk"
+    ],
+    "text": "Make k trainable to discover it, and check beyond the data.",
+    "edges": [
+     [
+      "adam",
+      "inv"
+     ],
+     [
+      "adam",
+      "chk"
+     ]
+    ]
+   }
+  ]
+ },
+ "sections": [
+  {
+   "heading": "Steps 1–3: network, points, residual",
+   "html": "<p>In PyTorch:</p><p><code>net = nn.Sequential(nn.Linear(1,32), nn.Tanh(), nn.Linear(32,32), nn.Tanh(), nn.Linear(32,1))</code><br><code>tc = torch.linspace(0,5,40).reshape(-1,1).requires_grad_(True)</code><br><code>y = net(tc); dy = torch.autograd.grad(y, tc, torch.ones_like(y), create_graph=True)[0]</code><br><code>residual = dy + k*y</code></p><p><code>create_graph=True</code> lets the optimiser differentiate through the derivative. Use smooth activations (tanh, not ReLU), because ReLU's second derivative is zero.</p>"
+  },
+  {
+   "heading": "Step 4–5: loss and training",
+   "html": "<p><code>loss = mse(net(td), yd) + lam*mean(residual**2) + mse(net(0), 1)</code>, then <code>loss.backward(); opt.step()</code> with <code>torch.optim.Adam(..., lr=1e-3)</code>. Plot the data and physics losses separately on a log scale. Healthy training: both fall. Data loss stuck high: physics weight too big or network too small. Physics loss stuck high: weight too small or too few collocation points. Many practitioners finish with the L-BFGS optimiser for extra accuracy.</p>"
+  },
+  {
+   "heading": "Step 6: the inverse problem",
+   "html": "<p>Make k trainable: <code>k = nn.Parameter(torch.tensor(0.3))</code> and add it to the optimiser. Now the PINN looks for a network <i>and</i> a k such that the data fit and the law holds. In the NumPy lab (hand-derived gradients, 16 neurons, 8,000 Adam steps) k moves from 0.3 to 0.798, and the error beyond the data is under 0.001. This is how PINNs estimate unknown physical parameters, such as a road's jam density, from sparse measurements.</p>"
+  },
+  {
+   "heading": "Common failure modes",
+   "html": "<p><b>Unscaled inputs</b>: scale t and y to about −1…1. <b>Imbalanced losses</b>: rescale or use adaptive weights. <b>Long time ranges or sharp fronts</b>: PINNs struggle (spectral bias, causality violations); split the domain or train sequentially in time. <b>Too few collocation points</b>: the law is not enforced between them. Always compare with a classical solver when one exists.</p>"
+  }
+ ],
+ "callouts": [
+  {
+   "after": 1,
+   "kind": "try",
+   "title": "Try it",
+   "html": "<p>Set λ = 10⁻³ and train. Which loss stays high? Now try λ = 10². What happens to the data loss?</p>"
+  },
+  {
+   "after": 2,
+   "kind": "research",
+   "title": "Research angle",
+   "html": "<p>Inverse problems are where PINNs beat classical methods most clearly: they fuse sparse data and physics to estimate parameters that cannot be measured directly.</p>"
+  }
+ ],
+ "explorer": {
+  "widget": "pinntrain",
+  "intro": "Train the physics-informed model with Adam and watch the data and physics losses.",
+  "predict": "If the physics weight is very small, which loss will stay high?"
+ },
+ "code": [
+  {
+   "title": "A PINN from scratch in NumPy (with the inverse problem)",
+   "lang": "python",
+   "file": "labs/go2/m22_pinn.py",
+   "runnable": true,
+   "explain": "A one-hidden-layer tanh network; the gradients of the data and physics losses are derived by hand, and k is learned.",
+   "expected": "epoch     1: data loss 1.22e+00, physics loss 5.74e-02, k = 0.290\nepoch  2000: data loss 1.73e-05, physics loss 1.41e-05, k = 0.797\nepoch  8000: data loss 1.30e-05, physics loss 4.56e-07, k = 0.798\nerror beyond the data: 0.0007"
+  },
+  {
+   "title": "The same PINN in PyTorch",
+   "lang": "python",
+   "file": "labs/go2/m22_pinn_torch.py",
+   "runnable": false,
+   "explain": "Autodiff replaces the hand-derived gradients. Requires pip install torch; about 10 seconds on a laptop CPU.",
+   "expected": "epoch 2000: data 1.05e-04, physics 9.91e-06, k = 0.827\nepoch 4000: data 1.05e-04, physics 1.11e-06, k = 0.828\nepoch 6000: data 1.04e-04, physics 1.33e-06, k = 0.828\nerror beyond the data: 0.0081"
+  }
+ ],
+ "takeaways": [
+  "A PINN needs a smooth network, collocation points, an autodiff residual and a composite loss.",
+  "Train with Adam and monitor data and physics losses separately.",
+  "Making a physical parameter trainable turns a PINN into an inverse-problem solver.",
+  "Scale inputs, balance losses and compare with classical solvers."
+ ],
+ "quiz": [
+  {
+   "q": "Why use tanh rather than ReLU in a PINN?",
+   "options": [
+    "It is faster",
+    "Its derivatives are smooth and nonzero, which the residual needs",
+    "ReLU is not allowed in PyTorch",
+    "No reason"
+   ],
+   "answer": 1,
+   "explain": "Residuals need derivatives."
+  },
+  {
+   "q": "What does create_graph=True do?",
+   "options": [
+    "Draws a plot",
+    "Lets the optimiser differentiate through the computed derivative",
+    "Creates a new network",
+    "Saves the model"
+   ],
+   "answer": 1,
+   "explain": "Higher-order autodiff."
+  },
+  {
+   "q": "The physics loss stays high while data loss is tiny. Try…",
+   "options": [
+    "Lowering λ",
+    "Raising λ or adding collocation points",
+    "Removing the data",
+    "Using ReLU"
+   ],
+   "answer": 1,
+   "explain": "Physics is losing."
+  },
+  {
+   "q": "To solve an inverse problem with a PINN you…",
+   "options": [
+    "Remove the physics term",
+    "Make the unknown parameter trainable",
+    "Reverse time",
+    "Use more layers only"
+   ],
+   "answer": 1,
+   "explain": "Learn k with the network."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Residual",
+   "def": "The amount by which the network breaks the governing equation at a point."
+  },
+  {
+   "term": "Adam",
+   "def": "An adaptive gradient-based optimiser widely used for training PINNs."
+  },
+  {
+   "term": "L-BFGS",
+   "def": "A quasi-Newton optimiser often used to refine PINN training."
+  },
+  {
+   "term": "Spectral bias",
+   "def": "The tendency of networks to learn smooth, low-frequency features first."
+  },
+  {
+   "term": "Inverse problem",
+   "def": "Estimating unknown parameters of a model from data."
+  }
+ ],
+ "resources": [
+  {
+   "title": "Raissi, Perdikaris and Karniadakis (2019)",
+   "url": "https://doi.org/10.1016/j.jcp.2018.10.045",
+   "why": "Original PINN paper with inverse examples."
+  },
+  {
+   "title": "Lu et al. (2021): DeepXDE",
+   "url": "https://doi.org/10.1137/19M1274067",
+   "why": "A library and a tutorial paper for PINNs."
+  },
+  {
+   "title": "Wang, Sankaran and Perdikaris (2024): Respecting causality for training PINNs",
+   "url": "https://doi.org/10.1016/j.cma.2024.116813",
+   "why": "Fixing a common failure mode."
+  }
+ ]
+}

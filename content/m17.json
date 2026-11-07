@@ -1,0 +1,327 @@
+{
+ "id": "1.7",
+ "go": 1,
+ "slug": "surrogates-and-emulators",
+ "title": "Surrogates and emulators: fast stand-ins",
+ "minutes": 35,
+ "tag": "Methods",
+ "systems": [
+  "learn",
+  "system"
+ ],
+ "summary": "A surrogate learns the input–output map of a slow simulator from a few runs, then answers new questions almost instantly. Where you sample and what you assume about smoothness decide its accuracy.",
+ "outcomes": [
+  "explain what a surrogate model is and when it pays off",
+  "build a simple surrogate by interpolating a few runs",
+  "describe how the number and placement of runs affect accuracy",
+  "give transport examples of expensive models worth emulating"
+ ],
+ "narration_en": "Many scientific models are slow. A detailed traffic simulation of a city, a climate and energy model such as GCAM, or a crash simulation can take hours for a single run. Yet we often want thousands of runs: to optimise a design, explore policies, or quantify uncertainty. A surrogate model, also called an emulator or metamodel, solves this. We run the expensive model at a few carefully chosen inputs, then fit a fast model to these input–output pairs. The surrogate answers new questions in milliseconds. Common surrogates include radial basis functions, Gaussian processes, polynomial chaos and neural networks. Accuracy depends on how many runs we make, where we place them, and how smooth the true relationship is. Placing runs evenly, or using space-filling designs such as Latin hypercubes, usually beats random placement. A good surrogate also says where it is unsure, so we know where to run the full model next. In this module you will emulate an expensive function with a handful of runs and see how placement and smoothness matter.",
+ "narration_ar": "كثير من النماذج العلمية بطيئة. فمحاكاة مرورية مفصلة لمدينة، أو نموذج للمناخ والطاقة مثل GCAM، أو محاكاة اصطدام، قد تستغرق ساعات للتشغيل الواحد. ومع ذلك نحتاج غالباً إلى آلاف التشغيلات: لتحسين تصميم، أو استكشاف سياسات، أو تقدير عدم اليقين. والنموذج البديل، ويسمى أيضاً المحاكي أو النموذج الفوقي، يحل هذه المشكلة. نشغّل النموذج المكلف عند مدخلات قليلة مختارة بعناية، ثم نبني نموذجاً سريعاً على أزواج المدخلات والمخرجات هذه، فيجيب البديل عن أسئلة جديدة في أجزاء من الثانية. ومن البدائل الشائعة دوال الأساس الشعاعية، والعمليات الغاوسية، وفوضى كثيرات الحدود، والشبكات العصبية. وتتوقف الدقة على عدد التشغيلات، ومواضعها، ومدى نعومة العلاقة الحقيقية. ووضع التشغيلات بانتظام، أو استخدام تصاميم تملأ الفضاء مثل المكعب اللاتيني الفائق، يتفوق عادة على الوضع العشوائي. والبديل الجيد يخبرنا أيضاً أين يكون غير متأكد، فنعرف أين نشغّل النموذج الكامل بعد ذلك. ستحاكي في هذه الوحدة دالة مكلفة بعدد قليل من التشغيلات.",
+ "diagram": {
+  "title": "Building and using a surrogate",
+  "caption": "A few expensive runs train a fast model, which then answers many questions; its uncertainty guides the next run.",
+  "nodes": [
+   {
+    "id": "sim",
+    "label": "Expensive model",
+    "sub": "hours per run",
+    "x": 140,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "system",
+    "detail": "A detailed simulator: city traffic, GCAM, finite-element crash model."
+   },
+   {
+    "id": "des",
+    "label": "Design of runs",
+    "sub": "where to sample",
+    "x": 140,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "data",
+    "detail": "Choose inputs to run: evenly spaced, Latin hypercube, or adaptive (where the surrogate is least sure)."
+   },
+   {
+    "id": "pairs",
+    "label": "Input–output pairs",
+    "sub": "training data",
+    "x": 450,
+    "y": 220,
+    "w": 170,
+    "h": 64,
+    "sys": "data",
+    "detail": "The results of the expensive runs."
+   },
+   {
+    "id": "sur",
+    "label": "Surrogate",
+    "sub": "RBF, GP, network",
+    "x": 760,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "A fast model fitted to the pairs: radial basis functions, Gaussian processes, neural networks."
+   },
+   {
+    "id": "use",
+    "label": "Many queries",
+    "sub": "optimise, explore, UQ",
+    "x": 760,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "apply",
+    "detail": "Thousands of evaluations for design optimisation, policy exploration and uncertainty quantification."
+   },
+   {
+    "id": "unc",
+    "label": "Surrogate uncertainty",
+    "sub": "where to run next",
+    "x": 450,
+    "y": 440,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "Where the surrogate is least sure, run the full model and add the result (active learning)."
+   }
+  ],
+  "edges": [
+   {
+    "from": "des",
+    "to": "sim",
+    "label": "run at"
+   },
+   {
+    "from": "sim",
+    "to": "pairs",
+    "label": ""
+   },
+   {
+    "from": "pairs",
+    "to": "sur",
+    "label": "train"
+   },
+   {
+    "from": "sur",
+    "to": "use",
+    "label": "fast"
+   },
+   {
+    "from": "sur",
+    "to": "unc",
+    "label": ""
+   },
+   {
+    "from": "unc",
+    "to": "des",
+    "label": "next run",
+    "sys": "risk"
+   }
+  ],
+  "tour": [
+   {
+    "focus": [
+     "sim"
+    ],
+    "text": "Start with a model that is accurate but slow."
+   },
+   {
+    "focus": [
+     "des",
+     "sim",
+     "pairs"
+    ],
+    "text": "Run it at a few chosen inputs.",
+    "edges": [
+     [
+      "des",
+      "sim"
+     ],
+     [
+      "sim",
+      "pairs"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "sur"
+    ],
+    "text": "Fit a fast surrogate to the results.",
+    "edges": [
+     [
+      "pairs",
+      "sur"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "use"
+    ],
+    "text": "Use the surrogate for thousands of queries.",
+    "edges": [
+     [
+      "sur",
+      "use"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "unc",
+     "des"
+    ],
+    "text": "Its uncertainty tells you where to run the full model next.",
+    "edges": [
+     [
+      "sur",
+      "unc"
+     ],
+     [
+      "unc",
+      "des"
+     ]
+    ]
+   }
+  ]
+ },
+ "sections": [
+  {
+   "heading": "When surrogates pay off",
+   "html": "<p>If one run takes an hour and a study needs 10,000 runs, the full model needs more than a year of computing. A surrogate built from 20 runs answers the rest in seconds. Surrogates pay off when runs are expensive, inputs are few (roughly up to 20), and the response is reasonably smooth.</p>"
+  },
+  {
+   "heading": "Interpolating with radial basis functions",
+   "html": "<p>A radial basis function (RBF) surrogate adds a bump centred at each run: ŝ(x) = Σ wⱼ exp(−(ε(x − xⱼ))²). The weights are chosen so that ŝ passes exactly through every run. ε sets how wide the bumps are: too narrow and the surrogate dips between runs; too wide and the system becomes ill-conditioned. In the explorer, 6 evenly spaced runs give an error of about 0.05, and 10 runs about 0.006.</p>"
+  },
+  {
+   "heading": "Designing the runs",
+   "html": "<p>Where you run matters as much as how many. Evenly spaced or <b>Latin hypercube</b> designs cover the input space; random designs leave gaps. <b>Adaptive</b> (active-learning) designs run the full model where the surrogate is most uncertain, which is where Gaussian processes (module 2.6) help. In Go 3 you will emulate a GCAM transport output this way.</p>"
+  }
+ ],
+ "callouts": [
+  {
+   "after": 1,
+   "kind": "try",
+   "title": "Try it",
+   "html": "<p>Use 6 runs and change ε from 0.3 to 6. Which values give a smooth, accurate surrogate? Then switch to random placement.</p>"
+  },
+  {
+   "after": 2,
+   "kind": "gcam",
+   "title": "GCAM link",
+   "html": "<p>Integrated assessment models such as GCAM are classic candidates for emulation: each scenario takes hours, and policy analysis needs thousands. See module 3.5.</p>"
+  }
+ ],
+ "explorer": {
+  "widget": "surrogate",
+  "intro": "An 'expensive' model takes one minute per run. Build a surrogate from a few runs.",
+  "predict": "How many evenly spaced runs do you need for an error below 0.05?"
+ },
+ "code": [
+  {
+   "title": "A radial basis function surrogate",
+   "lang": "python",
+   "runnable": true,
+   "source": "import numpy as np\nf = lambda x: np.sin(3*x) + 0.3*x**2          # stand-in for an expensive model\nxt = np.linspace(0, 3, 151)\nfor n in [4, 6, 10]:\n    xr = np.linspace(0, 3, n); eps = 1.5\n    K = np.exp(-(eps*(xr[:, None] - xr))**2) + 1e-8*np.eye(n)\n    w = np.linalg.solve(K, f(xr))\n    s = np.exp(-(eps*(xt[:, None] - xr))**2) @ w\n    print(f'{n:2d} runs: surrogate error {np.sqrt(np.mean((s - f(xt))**2)):.4f}')",
+   "explain": "More runs, smaller error, for a smooth function.",
+   "expected": "4 runs: surrogate error 0.5820\n 6 runs: surrogate error 0.0522\n10 runs: surrogate error 0.0060"
+  }
+ ],
+ "takeaways": [
+  "A surrogate is a fast model trained on a few runs of a slow one.",
+  "It pays off when runs are expensive and many queries are needed.",
+  "Accuracy depends on the number and placement of runs and on smoothness.",
+  "Uncertainty-aware surrogates tell you where to run the full model next."
+ ],
+ "quiz": [
+  {
+   "q": "A surrogate model is…",
+   "options": [
+    "A more detailed simulator",
+    "A fast approximation learned from runs of a slow model",
+    "A data cleaning step",
+    "A type of sensor"
+   ],
+   "answer": 1,
+   "explain": "A fast stand-in."
+  },
+  {
+   "q": "Surrogates pay off most when…",
+   "options": [
+    "Runs are cheap",
+    "Runs are expensive and many queries are needed",
+    "There is one query",
+    "Inputs number in the thousands"
+   ],
+   "answer": 1,
+   "explain": "Slow model, many questions."
+  },
+  {
+   "q": "Compared with random placement, evenly spaced runs usually…",
+   "options": [
+    "Leave more gaps",
+    "Cover the input space better",
+    "Need more runs",
+    "Are less accurate"
+   ],
+   "answer": 1,
+   "explain": "No gaps."
+  },
+  {
+   "q": "Active learning chooses the next run where…",
+   "options": [
+    "The surrogate is most certain",
+    "The surrogate is most uncertain",
+    "The input is zero",
+    "Runs are cheapest"
+   ],
+   "answer": 1,
+   "explain": "Learn where unsure."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Surrogate model",
+   "def": "A fast approximate model trained on input–output pairs of a slower model; also emulator or metamodel."
+  },
+  {
+   "term": "Radial basis function",
+   "def": "A function that depends only on distance from a centre, used as a building block for interpolation."
+  },
+  {
+   "term": "Design of experiments",
+   "def": "The choice of inputs at which to run a model or experiment."
+  },
+  {
+   "term": "Latin hypercube",
+   "def": "A space-filling design that spreads runs across each input's range."
+  },
+  {
+   "term": "Active learning",
+   "def": "Choosing new runs where the current model is most uncertain."
+  }
+ ],
+ "resources": [
+  {
+   "title": "Forrester, Sóbester and Keane (2008): Engineering Design via Surrogate Modelling",
+   "url": "https://doi.org/10.1002/9780470770801",
+   "why": "A practical textbook."
+  },
+  {
+   "title": "Gramacy (2020): Surrogates (free online book)",
+   "url": "https://bobby.gramacy.com/surrogates/",
+   "why": "Gaussian process surrogates with code."
+  },
+  {
+   "title": "Kennedy and O'Hagan (2001): Bayesian calibration of computer models",
+   "url": "https://doi.org/10.1111/1467-9868.00294",
+   "why": "The classic on emulators and calibration."
+  }
+ ]
+}

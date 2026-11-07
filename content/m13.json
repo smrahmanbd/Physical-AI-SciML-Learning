@@ -1,0 +1,329 @@
+{
+ "id": "1.3",
+ "go": 1,
+ "slug": "neural-networks-from-scratch",
+ "title": "Neural networks from scratch",
+ "minutes": 40,
+ "tag": "Foundations",
+ "systems": [
+  "learn",
+  "data"
+ ],
+ "summary": "A neural network is a flexible function built from simple units. Each neuron applies a weighted sum and a nonlinearity; stacked together they can approximate almost any smooth relationship.",
+ "outcomes": [
+  "describe a neuron as a weighted sum plus an activation function",
+  "explain why more neurons let a network fit more complex shapes",
+  "count the parameters of a small network",
+  "say what a network needs to learn: data, a loss and an optimiser"
+ ],
+ "narration_en": "A neural network is just a function with many adjustable knobs. The basic unit is a neuron. It takes inputs, multiplies each by a weight, adds them up with a bias, and passes the result through a nonlinear function such as the hyperbolic tangent, which looks like a soft step. One neuron can only make one soft step. But add many neurons side by side, each with its own position and steepness, and add their outputs with new weights, and you can build almost any smooth curve. This is the universal approximation idea. Stack layers and the network can build features of features. Learning means adjusting the weights so that the network's output matches the data, which is the topic of the next module. Networks are powerful but have no idea about physics: they only know the examples they saw. In this module you will add neurons one by one and watch a network bend into the shape of a function, and see what it struggles with.",
+ "narration_ar": "الشبكة العصبية ليست سوى دالة لها مقابض كثيرة قابلة للضبط. ووحدتها الأساسية هي العصبون: يأخذ المدخلات، ويضرب كلاً منها في وزن، ويجمعها مع انحياز، ثم يمرر الناتج عبر دالة غير خطية مثل الظل الزائدي، الذي يشبه درجة ناعمة. العصبون الواحد لا يصنع إلا درجة ناعمة واحدة، لكن إذا وضعنا عصبونات كثيرة جنباً إلى جنب، لكل منها موضعه وانحداره، وجمعنا مخرجاتها بأوزان جديدة، استطعنا بناء أي منحنى أملس تقريباً. هذه هي فكرة التقريب الشامل. وبتكديس الطبقات تستطيع الشبكة بناء خصائص من خصائص. والتعلم يعني ضبط الأوزان بحيث تطابق مخرجات الشبكة البيانات، وهذا موضوع الوحدة التالية. الشبكات قوية لكنها لا تعرف شيئاً عن الفيزياء، فهي لا تعرف إلا الأمثلة التي رأتها. ستضيف في هذه الوحدة عصبونات واحداً تلو الآخر وتشاهد الشبكة تنحني لتأخذ شكل دالة، وترى ما الذي يصعب عليها.",
+ "diagram": {
+  "title": "Inside a small network",
+  "caption": "Inputs flow through weighted sums and soft steps to an output; training adjusts the weights.",
+  "nodes": [
+   {
+    "id": "in",
+    "label": "Input x",
+    "sub": "e.g. time, density",
+    "x": 120,
+    "y": 220,
+    "w": 170,
+    "h": 64,
+    "sys": "data",
+    "detail": "The numbers we feed in: time, position, traffic density, temperature."
+   },
+   {
+    "id": "w",
+    "label": "Weights and biases",
+    "sub": "the adjustable knobs",
+    "x": 420,
+    "y": 80,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Every connection has a weight; every neuron a bias. A network with 10 hidden neurons and one input has 31 of them."
+   },
+   {
+    "id": "hid",
+    "label": "Hidden neurons",
+    "sub": "tanh(w·x + b)",
+    "x": 420,
+    "y": 220,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Each neuron makes a soft step whose position and steepness depend on its weight and bias."
+   },
+   {
+    "id": "out",
+    "label": "Output",
+    "sub": "weighted sum",
+    "x": 720,
+    "y": 220,
+    "w": 170,
+    "h": 64,
+    "sys": "system",
+    "detail": "The output adds the hidden neurons' values with output weights. More neurons, more possible shapes."
+   },
+   {
+    "id": "loss",
+    "label": "Loss",
+    "sub": "how wrong?",
+    "x": 720,
+    "y": 400,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "Compares outputs with the data, e.g. the mean squared error. Training lowers it."
+   },
+   {
+    "id": "data",
+    "label": "Training data",
+    "sub": "examples (x, y)",
+    "x": 420,
+    "y": 400,
+    "w": 170,
+    "h": 64,
+    "sys": "data",
+    "detail": "Pairs of inputs and correct outputs. The network only knows what these examples show."
+   }
+  ],
+  "edges": [
+   {
+    "from": "in",
+    "to": "hid",
+    "label": ""
+   },
+   {
+    "from": "w",
+    "to": "hid",
+    "label": "set"
+   },
+   {
+    "from": "hid",
+    "to": "out",
+    "label": "sum"
+   },
+   {
+    "from": "out",
+    "to": "loss",
+    "label": ""
+   },
+   {
+    "from": "data",
+    "to": "loss",
+    "label": "compare"
+   },
+   {
+    "from": "loss",
+    "to": "w",
+    "label": "adjust",
+    "sys": "risk"
+   }
+  ],
+  "tour": [
+   {
+    "focus": [
+     "in",
+     "hid"
+    ],
+    "text": "An input passes into the hidden neurons.",
+    "edges": [
+     [
+      "in",
+      "hid"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "hid",
+     "w"
+    ],
+    "text": "Each neuron computes a weighted sum and squashes it with tanh: a soft step.",
+    "edges": [
+     [
+      "w",
+      "hid"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "out"
+    ],
+    "text": "The output adds up the soft steps with new weights.",
+    "edges": [
+     [
+      "hid",
+      "out"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "loss",
+     "data"
+    ],
+    "text": "The loss measures how far the output is from the data.",
+    "edges": [
+     [
+      "out",
+      "loss"
+     ],
+     [
+      "data",
+      "loss"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "w"
+    ],
+    "text": "Training changes the weights to lower the loss.",
+    "edges": [
+     [
+      "loss",
+      "w"
+     ]
+    ]
+   }
+  ]
+ },
+ "sections": [
+  {
+   "heading": "A single neuron",
+   "html": "<p>A neuron computes <code>a = tanh(w·x + b)</code>. The weight w sets how steep the step is; the bias b sets where it is. The hyperbolic tangent squeezes any number into the range −1 to 1. Other common activation functions are the ReLU, max(0, z), and the sigmoid. Without a nonlinear activation, any stack of layers would collapse into a single straight line.</p>"
+  },
+  {
+   "heading": "Many neurons, many shapes",
+   "html": "<p>A layer of n neurons followed by a weighted sum gives <code>y = Σ vⱼ tanh(wⱼ x + bⱼ) + c</code>. With enough neurons this can approximate any continuous function on a bounded range (the <b>universal approximation theorem</b>, Cybenko 1989; Hornik 1991). Deeper networks (more layers) often need far fewer neurons for complex functions.</p><p>Parameter count for one input, n hidden neurons, one output: n weights + n biases + n output weights + 1 output bias = <b>3n + 1</b>.</p>"
+  },
+  {
+   "heading": "What networks cannot do alone",
+   "html": "<p>A network learns only from its examples. It struggles with sharp jumps (smooth neurons blur them), knows nothing outside the data range, and can give confident nonsense. It also has no built-in respect for physics: a network trained on traffic speeds can predict negative speeds. Adding physics, in Go 1 module 1.5 and throughout Go 2, is how SciML fixes this.</p>"
+  }
+ ],
+ "callouts": [
+  {
+   "after": 1,
+   "kind": "try",
+   "title": "Try it",
+   "html": "<p>Fit the smooth wave with 1, 2, 4 and 8 neurons. How many do you need before the error stops improving? Then try the jump.</p>"
+  },
+  {
+   "after": 2,
+   "kind": "trap",
+   "title": "Teaching shortcut",
+   "html": "<p>In this explorer only the output weights are fitted; the hidden weights are random. That is a real method (random features), but full networks train every weight.</p>"
+  }
+ ],
+ "explorer": {
+  "widget": "nnfit",
+  "intro": "Add hidden neurons and watch the network bend to fit a function.",
+  "predict": "Roughly how many neurons do you need to fit one smooth wave?"
+ },
+ "code": [
+  {
+   "title": "A neural network forward pass with NumPy",
+   "lang": "python",
+   "runnable": true,
+   "source": "import numpy as np\nrng = np.random.default_rng(5)\nn = 8                                    # hidden neurons\nW, b = 3*rng.standard_normal(n), rng.uniform(-3, 3, n)\nx = np.linspace(-1, 1, 30)\ny = np.sin(3*x)\nH = np.tanh(np.outer(x, W) + b)          # hidden layer outputs, 30 x 8\nH1 = np.c_[np.ones(30), H]\nv = np.linalg.lstsq(H1, y, rcond=None)[0]  # fit output weights\nprint('parameters:', 3*n + 1)\nprint(f'training error: {np.sqrt(np.mean((H1 @ v - y)**2)):.4f}')",
+   "explain": "Build the hidden layer, fit the output layer exactly, and measure the error.",
+   "expected": "parameters: 25\ntraining error: 0.0037"
+  }
+ ],
+ "takeaways": [
+  "A neuron computes a weighted sum and applies a nonlinear activation.",
+  "Many neurons together can approximate any smooth function.",
+  "A one-hidden-layer network with n neurons has 3n + 1 parameters.",
+  "Networks know only their data and nothing about physics."
+ ],
+ "quiz": [
+  {
+   "q": "A neuron computes…",
+   "options": [
+    "A sorted list",
+    "An activation of a weighted sum plus bias",
+    "The derivative of its input",
+    "Only additions"
+   ],
+   "answer": 1,
+   "explain": "a = σ(w·x + b)."
+  },
+  {
+   "q": "Why do networks need nonlinear activations?",
+   "options": [
+    "To run faster",
+    "Without them, layers collapse into one linear function",
+    "To use less memory",
+    "They do not need them"
+   ],
+   "answer": 1,
+   "explain": "Linear of linear is linear."
+  },
+  {
+   "q": "How many parameters has a network with 1 input, 10 hidden neurons and 1 output?",
+   "options": [
+    "11",
+    "21",
+    "31",
+    "100"
+   ],
+   "answer": 2,
+   "explain": "3 × 10 + 1 = 31."
+  },
+  {
+   "q": "A network trained only on light-traffic data may…",
+   "options": [
+    "Always be right in heavy traffic",
+    "Predict physically impossible values in heavy traffic",
+    "Refuse to answer",
+    "Discover physics by itself"
+   ],
+   "answer": 1,
+   "explain": "It knows only its examples."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Neuron",
+   "def": "A unit computing an activation of a weighted sum of inputs plus a bias."
+  },
+  {
+   "term": "Activation function",
+   "def": "The nonlinear function in a neuron, such as tanh or ReLU."
+  },
+  {
+   "term": "Weight",
+   "def": "An adjustable multiplier on a connection."
+  },
+  {
+   "term": "Bias",
+   "def": "An adjustable offset added inside a neuron."
+  },
+  {
+   "term": "Universal approximation",
+   "def": "The result that networks with enough neurons can approximate any continuous function on a bounded range."
+  }
+ ],
+ "resources": [
+  {
+   "title": "3Blue1Brown: Neural networks",
+   "url": "https://www.3blue1brown.com/topics/neural-networks",
+   "why": "The clearest visual introduction."
+  },
+  {
+   "title": "Nielsen: Neural Networks and Deep Learning (free book)",
+   "url": "http://neuralnetworksanddeeplearning.com/",
+   "why": "Chapter 4 shows universal approximation visually."
+  },
+  {
+   "title": "TensorFlow Playground",
+   "url": "https://playground.tensorflow.org/",
+   "why": "Train a small network in your browser."
+  }
+ ]
+}
