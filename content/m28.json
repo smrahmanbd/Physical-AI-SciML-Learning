@@ -1,0 +1,352 @@
+{
+ "id": "2.8",
+ "go": 2,
+ "slug": "validation-and-deployment",
+ "title": "Validation, uncertainty and deployment",
+ "minutes": 45,
+ "tag": "Deploy",
+ "systems": [
+  "risk",
+  "apply"
+ ],
+ "summary": "Before a SciML model is used, test it on unseen conditions, check physical consistency, attach calibrated intervals such as conformal predictions, and plan for monitoring, drift and fallbacks in deployment.",
+ "outcomes": [
+  "design validation tests beyond a single error number",
+  "build split conformal prediction intervals and check their coverage",
+  "explain conditional versus average coverage",
+  "list deployment concerns: latency, drift, monitoring and fallbacks"
+ ],
+ "narration_en": "A model is not finished when its training loss is low. Before anyone relies on it, we need four kinds of evidence. First, accuracy on truly unseen conditions: a different week, another city, a holiday. Second, physical consistency: does it conserve vehicles, keep speeds positive, respect capacity? Third, honest uncertainty: every prediction should come with an interval that contains the truth as often as it claims. Split conformal prediction is a simple, powerful way to get such intervals. Take a calibration set the model has not seen, compute its errors, and use the error that is beaten ninety percent of the time as a plus-or-minus band. The guarantee holds on average for any model, but not necessarily for every kind of input: when the noise grows with the input, the band is too wide for small inputs and too narrow for large ones. Fourth, a deployment plan: speed, monitoring for data drift, retraining, and a safe fallback when the model is unsure or sensors fail. In this module you will build conformal intervals and see where they fall short.",
+ "narration_ar": "لا يكتمل النموذج حين تنخفض خسارة تدريبه. فقبل أن يعتمد عليه أحد نحتاج إلى أربعة أنواع من الأدلة. أولاً، الدقة في ظروف لم يرها حقاً: أسبوع مختلف، أو مدينة أخرى، أو يوم عطلة. ثانياً، الاتساق الفيزيائي: هل يحفظ عدد المركبات، ويُبقي السرعات موجبة، ويحترم السعة؟ ثالثاً، عدم يقين صادق: يجب أن يصاحب كل تنبؤ مجالٌ يحتوي على القيمة الحقيقية بالقدر الذي يدّعيه. والتنبؤ المطابق المجزأ طريقة بسيطة وقوية للحصول على مثل هذه المجالات: نأخذ مجموعة معايرة لم يرها النموذج، ونحسب أخطاءه عليها، ونستخدم الخطأ الذي لا يُتجاوز في تسعين بالمئة من الحالات هامشاً بالزائد والناقص. والضمان صحيح في المتوسط لأي نموذج، لكن ليس بالضرورة لكل نوع من المدخلات: فحين تكبر الضوضاء مع المدخل يكون النطاق أوسع من اللازم للمدخلات الصغيرة وأضيق من اللازم للكبيرة. رابعاً، خطة نشر: السرعة، ومراقبة انحراف البيانات، وإعادة التدريب، وبديل آمن حين يكون النموذج غير متأكد أو تتعطل أجهزة الاستشعار. ستبني في هذه الوحدة مجالات مطابقة وترى أين تقصر.",
+ "diagram": {
+  "title": "From trained model to trusted service",
+  "caption": "Validation, physical checks and calibrated uncertainty come before deployment; monitoring and fallbacks come after.",
+  "nodes": [
+   {
+    "id": "mod",
+    "label": "Trained model",
+    "sub": "low training loss",
+    "x": 140,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "A good start, not an end."
+   },
+   {
+    "id": "val",
+    "label": "Unseen-condition tests",
+    "sub": "new weeks, sites, events",
+    "x": 450,
+    "y": 110,
+    "w": 200,
+    "h": 64,
+    "sys": "data",
+    "detail": "Out-of-distribution tests: holidays, incidents, other cities, future years."
+   },
+   {
+    "id": "phy",
+    "label": "Physical checks",
+    "sub": "conservation, bounds",
+    "x": 760,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "physics",
+    "detail": "Vehicles conserved, speeds ≥ 0, flows ≤ capacity, energy balances close."
+   },
+   {
+    "id": "uq",
+    "label": "Calibrated intervals",
+    "sub": "conformal, Bayesian",
+    "x": 760,
+    "y": 300,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "Intervals whose coverage is checked on held-out data."
+   },
+   {
+    "id": "dep",
+    "label": "Deployment",
+    "sub": "latency, edge, cloud",
+    "x": 450,
+    "y": 300,
+    "w": 170,
+    "h": 64,
+    "sys": "apply",
+    "detail": "Fast enough for its use: milliseconds in a vehicle, minutes for planning."
+   },
+   {
+    "id": "mon",
+    "label": "Monitoring + fallback",
+    "sub": "drift, retrain, safe mode",
+    "x": 140,
+    "y": 300,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "Watch input and error drift; retrain on schedule; fall back to physics when unsure."
+   },
+   {
+    "id": "doc",
+    "label": "Model card",
+    "sub": "scope, limits, data",
+    "x": 450,
+    "y": 460,
+    "w": 170,
+    "h": 64,
+    "sys": "system",
+    "detail": "Document what it is for, what data it saw, and where it must not be used."
+   }
+  ],
+  "edges": [
+   {
+    "from": "mod",
+    "to": "val",
+    "label": ""
+   },
+   {
+    "from": "val",
+    "to": "phy",
+    "label": ""
+   },
+   {
+    "from": "phy",
+    "to": "uq",
+    "label": ""
+   },
+   {
+    "from": "uq",
+    "to": "dep",
+    "label": ""
+   },
+   {
+    "from": "dep",
+    "to": "mon",
+    "label": ""
+   },
+   {
+    "from": "mon",
+    "to": "mod",
+    "label": "retrain",
+    "sys": "risk"
+   },
+   {
+    "from": "dep",
+    "to": "doc",
+    "label": "documented"
+   }
+  ],
+  "tour": [
+   {
+    "focus": [
+     "mod",
+     "val"
+    ],
+    "text": "Test on conditions the model has never seen.",
+    "edges": [
+     [
+      "mod",
+      "val"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "phy"
+    ],
+    "text": "Check physical consistency.",
+    "edges": [
+     [
+      "val",
+      "phy"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "uq"
+    ],
+    "text": "Attach intervals whose coverage you have checked.",
+    "edges": [
+     [
+      "phy",
+      "uq"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "dep",
+     "doc"
+    ],
+    "text": "Deploy with a model card describing scope and limits.",
+    "edges": [
+     [
+      "uq",
+      "dep"
+     ],
+     [
+      "dep",
+      "doc"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "mon"
+    ],
+    "text": "Monitor for drift, retrain, and fall back safely when unsure.",
+    "edges": [
+     [
+      "dep",
+      "mon"
+     ],
+     [
+      "mon",
+      "mod"
+     ]
+    ]
+   }
+  ]
+ },
+ "sections": [
+  {
+   "heading": "Validation beyond one number",
+   "html": "<p>Report errors separately for normal days, peaks, incidents and holidays; for each site; and for future periods. Test out of distribution on purpose. Add <b>physical checks</b>: count how often predictions break conservation or bounds. A model with slightly higher average error but no physical violations is often the safer choice.</p>"
+  },
+  {
+   "heading": "Split conformal prediction",
+   "html": "<p>(1) Train the model. (2) On a separate calibration set of n points, compute scores sᵢ = |yᵢ − ŷᵢ|. (3) Take q = the ⌈(n+1)(1−α)⌉-th smallest score. (4) Predict ŷ ± q. For a new exchangeable point, P(y inside) ≥ 1 − α on average (Vovk et al. 2005; Angelopoulos and Bates 2023). In the lab with 1,000 calibration points, a 90% target gives 90.5% coverage.</p>"
+  },
+  {
+   "heading": "Average is not conditional",
+   "html": "<p>The guarantee is marginal: averaged over all inputs. When noise grows with x, the same ±q band over-covers small x (about 100%) and under-covers large x (about 80%). Remedies: conformalised quantile regression, normalised scores (divide by a predicted spread), or calibrating separately by group. Always check coverage in the subgroups that matter, such as peak hours.</p>"
+  },
+  {
+   "heading": "Deployment",
+   "html": "<p>Decide latency (an automated vehicle needs milliseconds; a planning study can wait), hardware (edge device or cloud), and monitoring: track input distributions and live errors for <b>drift</b>, retrain on a schedule, and define a <b>fallback</b> (pure physics model, last good estimate, or a human) when uncertainty is high or sensors fail. Publish a <b>model card</b> stating scope, data and limits (Mitchell et al. 2019).</p>"
+  }
+ ],
+ "callouts": [
+  {
+   "after": 1,
+   "kind": "try",
+   "title": "Try it",
+   "html": "<p>Use only 10 calibration examples, then 500. How much does the achieved coverage wobble around the target? Look at large inputs.</p>"
+  },
+  {
+   "after": 3,
+   "kind": "trap",
+   "title": "Common trap",
+   "html": "<p>Calibrating on the training set gives intervals that are far too narrow, because the model has already fitted those points.</p>"
+  }
+ ],
+ "explorer": {
+  "widget": "conformal",
+  "intro": "Build split conformal intervals for a model whose noise grows with the input.",
+  "predict": "If you ask for 90% coverage, will large inputs get 90% too?"
+ },
+ "code": [
+  {
+   "title": "Split conformal prediction",
+   "lang": "python",
+   "file": "labs/go2/m28_conformal.py",
+   "runnable": true,
+   "explain": "Calibrate on 1,000 points, test on 20,000, and check coverage overall and by input size.",
+   "expected": "target 80%: interval ±1.00, coverage 81.9% (x<1: 97%, x>2: 67%)\ntarget 90%: interval ±1.32, coverage 90.5% (x<1: 100%, x>2: 80%)\ntarget 95%: interval ±1.66, coverage 95.2% (x<1: 100%, x>2: 89%)"
+  }
+ ],
+ "takeaways": [
+  "Validate on unseen conditions and check physical consistency, not just one error number.",
+  "Split conformal prediction gives distribution-free intervals with average coverage guarantees.",
+  "Average coverage can hide under-coverage in important subgroups.",
+  "Deploy with monitoring for drift, retraining, fallbacks and a model card."
+ ],
+ "quiz": [
+  {
+   "q": "Split conformal intervals use errors from…",
+   "options": [
+    "The training set",
+    "A separate calibration set",
+    "The test set",
+    "Random numbers"
+   ],
+   "answer": 1,
+   "explain": "Unseen calibration data."
+  },
+  {
+   "q": "The conformal guarantee holds…",
+   "options": [
+    "For every input",
+    "On average over inputs",
+    "Only for linear models",
+    "Never"
+   ],
+   "answer": 1,
+   "explain": "Marginal coverage."
+  },
+  {
+   "q": "When noise grows with x, a constant ±q band…",
+   "options": [
+    "Covers all x equally",
+    "Under-covers large x and over-covers small x",
+    "Is always too wide",
+    "Is undefined"
+   ],
+   "answer": 1,
+   "explain": "Conditional coverage fails."
+  },
+  {
+   "q": "A fallback in deployment means…",
+   "options": [
+    "Deleting the model",
+    "A safe alternative when the model is unsure or sensors fail",
+    "Retraining every second",
+    "Lower accuracy on purpose"
+   ],
+   "answer": 1,
+   "explain": "Safe mode."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Conformal prediction",
+   "def": "A method that turns any model's errors on calibration data into prediction intervals with coverage guarantees."
+  },
+  {
+   "term": "Marginal coverage",
+   "def": "Coverage averaged over all inputs."
+  },
+  {
+   "term": "Conditional coverage",
+   "def": "Coverage for a specific input or subgroup."
+  },
+  {
+   "term": "Data drift",
+   "def": "A change in the distribution of inputs or outcomes after deployment."
+  },
+  {
+   "term": "Model card",
+   "def": "A short document stating a model's intended use, data, performance and limits."
+  }
+ ],
+ "resources": [
+  {
+   "title": "Angelopoulos and Bates (2023): Conformal prediction: a gentle introduction",
+   "url": "https://doi.org/10.1561/2200000101",
+   "why": "The clearest tutorial, with code."
+  },
+  {
+   "title": "Mitchell et al. (2019): Model cards for model reporting",
+   "url": "https://doi.org/10.1145/3287560.3287596",
+   "why": "How to document a model."
+  },
+  {
+   "title": "NIST AI Risk Management Framework",
+   "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+   "why": "Guidance on trustworthy AI deployment."
+  }
+ ]
+}

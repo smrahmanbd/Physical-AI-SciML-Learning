@@ -1,0 +1,341 @@
+{
+ "id": "3.2",
+ "go": 3,
+ "slug": "car-following-and-automation",
+ "title": "Car following, automated vehicles and Physical AI",
+ "minutes": 50,
+ "tag": "Vehicles",
+ "systems": [
+  "apply",
+  "physics"
+ ],
+ "summary": "Car-following models describe how drivers react to the vehicle ahead. Physics-based models, learned residuals and cooperative automation decide whether braking waves fade or grow along a platoon.",
+ "outcomes": [
+  "describe the Intelligent Driver Model and its parameters",
+  "explain string stability and why human platoons amplify braking",
+  "compare human drivers, adaptive cruise control and cooperative ACC",
+  "outline how learned and physics models are combined in automated driving"
+ ],
+ "narration_en": "Every driver follows the car ahead, keeping a gap that depends on speed. Car-following models write this down. The Intelligent Driver Model, by Treiber, Hennecke and Helbing, says a driver accelerates towards a desired speed but brakes as the gap shrinks below a safe distance that grows with speed and closing rate. Its few parameters, desired speed, time gap, maximum acceleration and comfortable braking, have clear physical meaning. Now put ten such drivers in a line and let the leader brake. If each follower reacts a little late and a little harder than the one ahead, the braking wave grows along the line, and the last car may stop completely. This is string instability, the origin of phantom jams. Automated vehicles are Physical AI: adaptive cruise control senses the gap by radar and reacts without delay, and cooperative adaptive cruise control also receives the leader's braking by radio, so it can damp the wave. Learned models can improve on physics, for example by adding a neural residual to the IDM, but must stay safe. In this module you will make a braking wave grow and then tame it.",
+ "narration_ar": "كل سائق يتبع السيارة التي أمامه، محافظاً على مسافة تتوقف على السرعة. ونماذج تتبع المركبات تكتب ذلك رياضياً. فنموذج السائق الذكي، الذي قدّمه تريبر وهينيكه وهيلبينغ، يقول إن السائق يتسارع نحو سرعة مرغوبة لكنه يكبح حين تقل المسافة عن مسافة آمنة تزداد مع السرعة ومعدل الاقتراب. ومعاملاته القليلة، أي السرعة المرغوبة والفاصل الزمني وأقصى تسارع والكبح المريح، لها معنى فيزيائي واضح. ضع الآن عشرة سائقين كهؤلاء في صف ودع القائد يكبح. فإذا تأخر كل تابع قليلاً وكبح أشد قليلاً من الذي أمامه، كبرت موجة الكبح على امتداد الصف، وقد تتوقف السيارة الأخيرة تماماً. هذا هو عدم استقرار السلسلة، أصل الاختناقات الشبحية. والمركبات الآلية ذكاء اصطناعي مادي: فمثبت السرعة التكيفي يستشعر المسافة بالرادار ويستجيب بلا تأخير، ومثبت السرعة التكيفي التعاوني يتلقى أيضاً كبح القائد عبر الاتصال اللاسلكي، فيستطيع إخماد الموجة. ويمكن للنماذج المتعلَّمة أن تحسّن الفيزياء، مثلاً بإضافة بقية عصبية إلى نموذج السائق الذكي، لكن يجب أن تبقى آمنة. ستجعل في هذه الوحدة موجة كبح تكبر ثم تروّضها.",
+ "diagram": {
+  "title": "A braking wave along a platoon",
+  "caption": "Each vehicle's controller turns perception of the vehicle ahead into acceleration; delays and gains decide whether disturbances grow.",
+  "nodes": [
+   {
+    "id": "lead",
+    "label": "Lead vehicle",
+    "sub": "brakes hard for 4 s",
+    "x": 140,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "system",
+    "detail": "The disturbance: a sudden slowdown at the front of the line."
+   },
+   {
+    "id": "sense",
+    "label": "Perception",
+    "sub": "eyes, radar, V2V",
+    "x": 450,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "data",
+    "detail": "Humans see the gap and brake lights with delay; radar measures gap and relative speed; V2V radio sends the leader's acceleration instantly."
+   },
+   {
+    "id": "ctrl",
+    "label": "Controller",
+    "sub": "IDM, ACC, CACC",
+    "x": 760,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "physics",
+    "detail": "IDM: a = a_max[1 − (v/v0)⁴ − (s*/s)²], s* = s0 + vT + vΔv/(2√(ab)). ACC and CACC are automated versions."
+   },
+   {
+    "id": "act",
+    "label": "Acceleration",
+    "sub": "brake or throttle",
+    "x": 760,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "apply",
+    "detail": "Limited by tyres and comfort: about −9 to +3 m/s²."
+   },
+   {
+    "id": "next",
+    "label": "Next vehicle",
+    "sub": "sees the result",
+    "x": 450,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "system",
+    "detail": "Each follower becomes the leader of the next: the disturbance passes down the line."
+   },
+   {
+    "id": "ss",
+    "label": "String stability",
+    "sub": "does the wave shrink?",
+    "x": 140,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "If speed dips shrink down the platoon, it is string stable; if they grow, phantom jams and rear-end risk follow."
+   },
+   {
+    "id": "ml",
+    "label": "Learned residual",
+    "sub": "IDM + network",
+    "x": 450,
+    "y": 460,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "A network trained on trajectories corrects the IDM's acceleration; physics keeps it safe and interpretable."
+   }
+  ],
+  "edges": [
+   {
+    "from": "lead",
+    "to": "sense",
+    "label": ""
+   },
+   {
+    "from": "sense",
+    "to": "ctrl",
+    "label": ""
+   },
+   {
+    "from": "ctrl",
+    "to": "act",
+    "label": ""
+   },
+   {
+    "from": "act",
+    "to": "next",
+    "label": ""
+   },
+   {
+    "from": "next",
+    "to": "ss",
+    "label": ""
+   },
+   {
+    "from": "ml",
+    "to": "ctrl",
+    "label": "corrects",
+    "sys": "data"
+   }
+  ],
+  "tour": [
+   {
+    "focus": [
+     "lead"
+    ],
+    "text": "The lead car brakes suddenly."
+   },
+   {
+    "focus": [
+     "sense",
+     "ctrl"
+    ],
+    "text": "The follower perceives it, with or without delay, and its controller chooses an acceleration.",
+    "edges": [
+     [
+      "lead",
+      "sense"
+     ],
+     [
+      "sense",
+      "ctrl"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "act",
+     "next"
+    ],
+    "text": "That acceleration becomes the disturbance for the next car.",
+    "edges": [
+     [
+      "ctrl",
+      "act"
+     ],
+     [
+      "act",
+      "next"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "ss"
+    ],
+    "text": "If dips grow down the line, the platoon is string unstable.",
+    "edges": [
+     [
+      "next",
+      "ss"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "ml"
+    ],
+    "text": "Learned residuals can refine the physics model.",
+    "edges": [
+     [
+      "ml",
+      "ctrl"
+     ]
+    ]
+   }
+  ]
+ },
+ "sections": [
+  {
+   "heading": "The Intelligent Driver Model",
+   "html": "<p>IDM (Treiber, Hennecke and Helbing 2000):</p><div class=\"eq\">a = a<sub>max</sub> [1 − (v/v₀)⁴ − (s*/s)²],  s* = s₀ + vT + vΔv / (2√(a<sub>max</sub> b))</div><p>v₀ desired speed, T desired time gap, s₀ minimum gap, b comfortable braking, Δv closing speed. Five interpretable parameters, collision-free in normal conditions, and widely used in simulation and as a baseline for learned models.</p>"
+  },
+  {
+   "heading": "String stability",
+   "html": "<p>A platoon is <b>string stable</b> if a speed dip shrinks as it travels back. In the explorer, after the leader brakes from 90 to about 40 km/h: human drivers with 0.8 s reaction amplify the dip (factor about 1.8; the last car stops), ACC with T = 1.2 s damps it (factor about 0.5), and cooperative ACC damps it further (about 0.3). Longer time gaps help stability but reduce road capacity: a real trade-off.</p>"
+  },
+  {
+   "heading": "Learning car following",
+   "html": "<p>Data-driven car-following models (neural networks, Gaussian processes) learn from trajectory data such as NGSIM, highD or Waymo Open. Pure learned models can produce unsafe accelerations in rare situations. Physics-informed options: (1) a residual network on top of IDM; (2) a network predicting IDM parameters by context; (3) training with a loss that penalises IDM deviations (Mo, Shi and Di 2021). All keep collision avoidance and interpretability.</p>"
+  },
+  {
+   "heading": "Physical AI on the road",
+   "html": "<p>An automated vehicle runs the sense–estimate–decide–act loop of module 1.8 at high rate: learned perception (cameras, lidar), physics-based estimation and prediction, planning and control with safety constraints. Research frontiers include learned world models that simulate traffic, verification of learned controllers, and mixed traffic where a few automated vehicles stabilise many human drivers (Stern et al. 2018).</p>"
+  }
+ ],
+ "callouts": [
+  {
+   "after": 1,
+   "kind": "try",
+   "title": "Try it",
+   "html": "<p>Choose human drivers and increase the time gap from 0.6 to 2.5 s. At what gap does the wave stop growing? What does that cost in road capacity?</p>"
+  },
+  {
+   "after": 3,
+   "kind": "research",
+   "title": "Research angle",
+   "html": "<p>A field experiment (Stern et al. 2018) showed that a single automated vehicle could dampen stop-and-go waves among about 20 human-driven cars on a ring road.</p>"
+  }
+ ],
+ "explorer": {
+  "widget": "idm",
+  "intro": "Ten vehicles follow a leader who brakes hard for 4 seconds. Choose who drives and the time gap.",
+  "predict": "With human drivers, will the last car slow down more or less than the leader?"
+ },
+ "code": [
+  {
+   "title": "Platoons of humans, ACC and cooperative ACC",
+   "lang": "python",
+   "file": "labs/go3/m32_carfollowing.py",
+   "runnable": true,
+   "explain": "IDM platoons with a human reaction delay, ACC and cooperative ACC; amplification of the braking dip.",
+   "expected": "human: last car's lowest speed   0.0 km/h, amplification 1.79\nacc  : last car's lowest speed  65.6 km/h, amplification 0.48\ncacc : last car's lowest speed  75.1 km/h, amplification 0.30"
+  }
+ ],
+ "takeaways": [
+  "The Intelligent Driver Model describes car following with five meaningful parameters.",
+  "Delays and aggressive reactions make platoons string unstable, creating phantom jams.",
+  "ACC and especially cooperative ACC can damp braking waves.",
+  "Learned car-following models are safest when combined with physics."
+ ],
+ "quiz": [
+  {
+   "q": "String instability means…",
+   "options": [
+    "Cars drive in a straight line",
+    "Speed disturbances grow as they pass down a platoon",
+    "Engines fail",
+    "Gaps stay constant"
+   ],
+   "answer": 1,
+   "explain": "Waves grow."
+  },
+  {
+   "q": "What does cooperative ACC add to ACC?",
+   "options": [
+    "A bigger engine",
+    "Information from the vehicle ahead by radio (V2V)",
+    "A human driver",
+    "Longer gaps only"
+   ],
+   "answer": 1,
+   "explain": "Communication."
+  },
+  {
+   "q": "In the IDM, T is…",
+   "options": [
+    "Top speed",
+    "The desired time gap",
+    "The temperature",
+    "Total trip time"
+   ],
+   "answer": 1,
+   "explain": "Following time gap."
+  },
+  {
+   "q": "Why combine learned car-following models with physics?",
+   "options": [
+    "To slow them down",
+    "To keep behaviour safe and interpretable in rare situations",
+    "It is required by law",
+    "Physics is always more accurate"
+   ],
+   "answer": 1,
+   "explain": "Safety."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Car-following model",
+   "def": "A model of how a driver adjusts speed in response to the vehicle ahead."
+  },
+  {
+   "term": "Intelligent Driver Model (IDM)",
+   "def": "A widely used car-following model with five interpretable parameters."
+  },
+  {
+   "term": "String stability",
+   "def": "The property that disturbances shrink as they propagate along a platoon."
+  },
+  {
+   "term": "Adaptive cruise control (ACC)",
+   "def": "An automated system that keeps a set gap to the vehicle ahead using radar."
+  },
+  {
+   "term": "Cooperative ACC (CACC)",
+   "def": "ACC that also uses wireless data from other vehicles."
+  }
+ ],
+ "resources": [
+  {
+   "title": "Treiber, Hennecke and Helbing (2000): Congested traffic states",
+   "url": "https://doi.org/10.1103/PhysRevE.62.1805",
+   "why": "The IDM paper."
+  },
+  {
+   "title": "Mo, Shi and Di (2021): A physics-informed deep learning paradigm for car-following models",
+   "url": "https://doi.org/10.1016/j.trc.2021.103240",
+   "why": "Physics-informed car following."
+  },
+  {
+   "title": "Stern et al. (2018): Dissipation of stop-and-go waves via control of autonomous vehicles",
+   "url": "https://doi.org/10.1016/j.trc.2018.02.005",
+   "why": "The ring-road field experiment."
+  }
+ ]
+}

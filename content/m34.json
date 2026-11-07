@@ -1,0 +1,321 @@
+{
+ "id": "3.4",
+ "go": 3,
+ "slug": "energy-and-emissions",
+ "title": "Sustainability: vehicle energy and emissions",
+ "minutes": 45,
+ "tag": "Energy",
+ "systems": [
+  "physics",
+  "apply"
+ ],
+ "summary": "Vehicle energy follows from physics: mass, acceleration, grade, rolling resistance and drag. Hybrid models add learned corrections for engines and traffic, giving accurate, explainable emission estimates for policies.",
+ "outcomes": [
+  "compute tractive power from the road-load equation",
+  "explain how driving style, grade and vehicle type change energy and CO₂",
+  "build a hybrid emission model: physics plus a learned correction",
+  "connect vehicle-level models to network and policy analysis"
+ ],
+ "narration_en": "Transport produces around a fifth of global carbon dioxide emissions, so estimating vehicle energy use accurately matters for every climate policy. Physics gives most of the answer. The power needed at the wheels is mass times speed times acceleration plus gravity on a grade, plus rolling resistance, plus air drag, which grows with the cube of speed. This road-load equation is behind the vehicle specific power used in the US EPA's MOVES model. A petrol engine turns only about a quarter of its fuel energy into motion, and wastes all braking energy; an electric car is about three times as efficient and recovers part of its braking energy. In our example, an aggressive driving style raises petrol CO₂ by about ten percent, a constant four percent uphill grade roughly doubles it, and the electric car uses about thirteen kilowatt hours per hundred kilometres. What physics misses, such as how engine efficiency varies with load, can be learned from measurements with a hybrid model, which keeps the physics' sound behaviour for new driving styles. In this module you will drive the same trip in different styles and vehicles.",
+ "narration_ar": "يُنتج النقل نحو خُمس انبعاثات ثاني أكسيد الكربون في العالم، لذا فإن تقدير استهلاك المركبات للطاقة بدقة مهم لكل سياسة مناخية. والفيزياء تعطي معظم الإجابة. فالقدرة اللازمة عند العجلات تساوي الكتلة مضروبة في السرعة مضروبة في مجموع التسارع والجاذبية على المنحدر، مضافاً إليها مقاومة التدحرج ومقاومة الهواء التي تزداد مع مكعب السرعة. ومعادلة حمل الطريق هذه هي أساس القدرة النوعية للمركبة المستخدمة في نموذج MOVES التابع لوكالة حماية البيئة الأمريكية. ومحرك البنزين لا يحوّل إلى حركة إلا نحو ربع طاقة وقوده، ويهدر كل طاقة الكبح، أما السيارة الكهربائية فأكفأ بنحو ثلاث مرات وتستعيد جزءاً من طاقة كبحها. وفي مثالنا يرفع أسلوب القيادة العدواني انبعاثات البنزين بنحو عشرة بالمئة، ويضاعفها تقريباً منحدر صاعد ثابت بنسبة أربعة بالمئة، وتستهلك السيارة الكهربائية نحو ثلاثة عشر كيلوواط ساعة لكل مئة كيلومتر. وما تغفله الفيزياء، كتغير كفاءة المحرك مع الحمل، يمكن تعلّمه من القياسات بنموذج هجين يحتفظ بالسلوك السليم للفيزياء في أساليب القيادة الجديدة. ستقود في هذه الوحدة الرحلة نفسها بأساليب ومركبات مختلفة.",
+ "diagram": {
+  "title": "From driving to emissions",
+  "caption": "Speed profiles give tractive power by physics; powertrain models and learned corrections give energy; networks and policies scale it up.",
+  "nodes": [
+   {
+    "id": "cyc",
+    "label": "Driving cycle",
+    "sub": "speed over time",
+    "x": 140,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "data",
+    "detail": "From GPS traces, traffic simulation or standard test cycles."
+   },
+   {
+    "id": "rl",
+    "label": "Road-load equation",
+    "sub": "P = m v (a + g sinθ) + ...",
+    "x": 450,
+    "y": 110,
+    "w": 210,
+    "h": 64,
+    "sys": "physics",
+    "detail": "Inertia, grade, rolling resistance (m g C_r v) and drag (½ ρ C_d A v³)."
+   },
+   {
+    "id": "pt",
+    "label": "Powertrain",
+    "sub": "engine, battery, regen",
+    "x": 760,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "physics",
+    "detail": "Petrol ~25% efficient, no regen; electric ~85% with partial regenerative braking."
+   },
+   {
+    "id": "ml",
+    "label": "Learned correction",
+    "sub": "engine maps, traffic",
+    "x": 760,
+    "y": 300,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Fit the residual between physics and measured fuel or energy: efficiency at different loads, cold starts, auxiliaries."
+   },
+   {
+    "id": "em",
+    "label": "Energy and CO₂",
+    "sub": "per km, per trip",
+    "x": 450,
+    "y": 300,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "Petrol ~73 g CO₂ per MJ of fuel; electricity depends on the grid mix."
+   },
+   {
+    "id": "net",
+    "label": "Network and policy",
+    "sub": "fleets, scenarios",
+    "x": 140,
+    "y": 300,
+    "w": 170,
+    "h": 64,
+    "sys": "apply",
+    "detail": "Scale to corridors and cities with traffic models; feed into national and global models such as GCAM (module 3.5)."
+   }
+  ],
+  "edges": [
+   {
+    "from": "cyc",
+    "to": "rl",
+    "label": ""
+   },
+   {
+    "from": "rl",
+    "to": "pt",
+    "label": "power"
+   },
+   {
+    "from": "pt",
+    "to": "em",
+    "label": ""
+   },
+   {
+    "from": "ml",
+    "to": "em",
+    "label": "corrects"
+   },
+   {
+    "from": "em",
+    "to": "net",
+    "label": ""
+   }
+  ],
+  "tour": [
+   {
+    "focus": [
+     "cyc",
+     "rl"
+    ],
+    "text": "A speed profile and the road-load equation give the power at the wheels.",
+    "edges": [
+     [
+      "cyc",
+      "rl"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "pt"
+    ],
+    "text": "The powertrain turns this into fuel or battery energy.",
+    "edges": [
+     [
+      "rl",
+      "pt"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "ml"
+    ],
+    "text": "A learned correction fixes what the simple physics misses.",
+    "edges": [
+     [
+      "ml",
+      "em"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "em"
+    ],
+    "text": "The result: energy and CO₂ per kilometre.",
+    "edges": [
+     [
+      "pt",
+      "em"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "net"
+    ],
+    "text": "Scaled up, it informs network and climate policy.",
+    "edges": [
+     [
+      "em",
+      "net"
+     ]
+    ]
+   }
+  ]
+ },
+ "sections": [
+  {
+   "heading": "The road-load equation",
+   "html": "<div class=\"eq\">P = m v (a + g sin θ) + m g C<sub>r</sub> v cos θ + ½ ρ C<sub>d</sub>A v³</div><p>For a 1,500 kg car at 20 m/s on the level: rolling ≈ 3.5 kW, drag (C<sub>d</sub>A = 0.7 m²) ≈ 3.4 kW; accelerating at 1 m/s² adds 30 kW. Vehicle specific power (VSP, Jiménez-Palacios 1999) divides by mass and underlies the US EPA MOVES model's operating modes.</p>"
+  },
+  {
+   "heading": "Style, grade and vehicle",
+   "html": "<p>In the explorer (synthetic urban trip, about 5 km): petrol car ≈ 138 g CO₂/km; aggressive style (2× acceleration) ≈ 152 g/km; a constant 4% uphill grade ≈ 297 g/km; electric car ≈ 13 kWh/100 km, ≈ 60 g/km at 450 g/kWh grid intensity. Electric cars gain most in stop-and-go traffic because regenerative braking recovers energy that petrol cars waste.</p>"
+  },
+  {
+   "heading": "A hybrid emission model",
+   "html": "<p>Measured fuel use departs from the simple constant-efficiency model because efficiency varies with load. In the lab, the physics model underestimates CO₂ by about 9% (152 vs 167 g/km); fitting a small correction as a function of power on two driving styles fixes this on an unseen style (167 vs 167) and still helps for a more aggressive one (169 vs 174). The physics keeps the model sensible for new conditions; pure ML trained on one cycle would not be.</p>"
+  },
+  {
+   "heading": "From vehicles to policy",
+   "html": "<p>Link vehicle models to traffic simulation (link speeds and accelerations) to estimate corridor emissions; to fleet models (EV share, vehicle age) for city scenarios; and to integrated assessment models for national and global pathways. Uncertainty in grid carbon intensity, fleet mix and driving behaviour should be carried through.</p>"
+  }
+ ],
+ "callouts": [
+  {
+   "after": 1,
+   "kind": "try",
+   "title": "Try it",
+   "html": "<p>Compare petrol and electric at driving style 0.5 and 2.5. Which vehicle is more sensitive to aggressive driving, and why?</p>"
+  },
+  {
+   "after": 3,
+   "kind": "gcam",
+   "title": "GCAM link",
+   "html": "<p>GCAM's transport module represents vehicle technologies by energy intensity; better vehicle-level physics and hybrid models improve those inputs.</p>"
+  }
+ ],
+ "explorer": {
+  "widget": "vsp",
+  "intro": "The same urban trip: change driving style, road grade and vehicle type.",
+  "predict": "Will a 4% uphill grade change CO₂ by about 10%, 50% or 100%?"
+ },
+ "code": [
+  {
+   "title": "Physics vs hybrid emission model",
+   "lang": "python",
+   "file": "labs/go3/m34_energy.py",
+   "runnable": true,
+   "explain": "Road-load physics with constant efficiency, plus a correction learned from 'measured' fuel on two driving styles, tested on unseen styles.",
+   "expected": "style x1.3: true   167 g/km, physics   152 g/km, hybrid   167 g/km\nstyle x2.0: true   174 g/km, physics   161 g/km, hybrid   169 g/km"
+  }
+ ],
+ "takeaways": [
+  "Tractive power follows the road-load equation: inertia, grade, rolling and drag.",
+  "Grade and driving style change emissions strongly; EVs recover braking energy.",
+  "Hybrid models correct physics with measurements and extrapolate sensibly.",
+  "Vehicle models scale to networks, fleets and integrated assessment models."
+ ],
+ "quiz": [
+  {
+   "q": "Air drag power grows with…",
+   "options": [
+    "Speed",
+    "Speed squared",
+    "Speed cubed",
+    "Mass"
+   ],
+   "answer": 2,
+   "explain": "½ ρ C_d A v³."
+  },
+  {
+   "q": "Why do electric cars do especially well in stop-and-go traffic?",
+   "options": [
+    "They are lighter",
+    "Regenerative braking recovers energy that petrol cars waste",
+    "They have no drag",
+    "They drive slower"
+   ],
+   "answer": 1,
+   "explain": "Regen."
+  },
+  {
+   "q": "In the hybrid emission model, machine learning corrects…",
+   "options": [
+    "The road grade",
+    "The physics model's error, such as varying engine efficiency",
+    "The speed profile",
+    "Nothing"
+   ],
+   "answer": 1,
+   "explain": "Residual learning."
+  },
+  {
+   "q": "Vehicle specific power is used in…",
+   "options": [
+    "GPS receivers",
+    "The US EPA MOVES emission model",
+    "Traffic signals",
+    "Crash tests"
+   ],
+   "answer": 1,
+   "explain": "Operating modes."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Road-load equation",
+   "def": "The power needed to overcome inertia, grade, rolling resistance and aerodynamic drag."
+  },
+  {
+   "term": "Vehicle specific power (VSP)",
+   "def": "Tractive power per unit mass, used to classify driving for emission estimation."
+  },
+  {
+   "term": "Regenerative braking",
+   "def": "Recovering kinetic energy during braking to recharge a battery."
+  },
+  {
+   "term": "Grid carbon intensity",
+   "def": "CO₂ emitted per kWh of electricity generated."
+  },
+  {
+   "term": "MOVES",
+   "def": "The US EPA's MOtor Vehicle Emission Simulator."
+  }
+ ],
+ "resources": [
+  {
+   "title": "Jiménez-Palacios (1999): Understanding and quantifying motor vehicle emissions with vehicle specific power (MIT thesis)",
+   "url": "https://dspace.mit.edu/handle/1721.1/44505",
+   "why": "The origin of VSP."
+  },
+  {
+   "title": "US EPA MOVES",
+   "url": "https://www.epa.gov/moves",
+   "why": "The emission model and documentation."
+  },
+  {
+   "title": "IEA: Global EV Outlook",
+   "url": "https://www.iea.org/reports/global-ev-outlook-2025",
+   "why": "Fleet and energy context for EVs."
+  }
+ ]
+}

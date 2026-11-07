@@ -1,0 +1,337 @@
+{
+ "id": "2.7",
+ "go": 2,
+ "slug": "hybrid-modelling",
+ "title": "Hybrid modelling: physics plus learned corrections",
+ "minutes": 45,
+ "tag": "Build",
+ "systems": [
+  "physics",
+  "learn"
+ ],
+ "summary": "A hybrid model keeps a physics model and learns only what it gets wrong. It needs fewer data than pure machine learning and extrapolates far more safely, as long as the physics part is sound.",
+ "outcomes": [
+  "design a residual (additive) hybrid model",
+  "compare physics-only, ML-only and hybrid models beyond the data",
+  "list other hybrid patterns: parameter learning, closures, gray-box models",
+  "decide when a hybrid is the right choice"
+ ],
+ "narration_en": "Often we have a physics model that is good but not perfect. The textbook Greenshields model says traffic speed falls in a straight line as density rises. Real roads curve away from that line. One option is to throw the physics away and fit a flexible machine learning model to the data. Another is to keep the physics and learn only the correction: the hybrid approach. The learned part now has an easy job, modelling a small, smooth residual, so it needs fewer data and stays well behaved. Crucially, where there are no data, the hybrid falls back on the physics instead of inventing something. In our example, with speed observations only up to sixty vehicles per kilometre, a pure polynomial model is off by hundreds of kilometres per hour at high density, the physics alone is off by about thirteen, and the hybrid by about three and a half. Other hybrid patterns include learning unknown parameters of a physics model, learning closure terms for unresolved processes, and gray-box models. In this module you will compare the three approaches as you change how much data you have.",
+ "narration_ar": "كثيراً ما يكون لدينا نموذج فيزيائي جيد لكنه غير كامل. فنموذج غرينشيلدز الوارد في الكتب يقول إن سرعة المرور تنخفض على خط مستقيم كلما زادت الكثافة، لكن الطرق الحقيقية تنحني بعيداً عن هذا الخط. أحد الخيارات أن نتخلى عن الفيزياء ونطابق البيانات بنموذج تعلم آلي مرن، والخيار الآخر أن نحتفظ بالفيزياء ونتعلم التصحيح فقط، وهذا هو النهج الهجين. فيصبح للجزء المتعلَّم مهمة سهلة: نمذجة بقية صغيرة ملساء، فيحتاج إلى بيانات أقل ويبقى حسن السلوك. والأهم أنه حيث لا توجد بيانات يعود النموذج الهجين إلى الفيزياء بدلاً من أن يختلق شيئاً. ففي مثالنا، وبملاحظات سرعة حتى ستين مركبة لكل كيلومتر فقط، يخطئ نموذج كثير الحدود الصرف بمئات الكيلومترات في الساعة عند الكثافات العالية، وتخطئ الفيزياء وحدها بنحو ثلاثة عشر، ويخطئ النموذج الهجين بنحو ثلاثة ونصف. ومن الأنماط الهجينة الأخرى تعلّم المعاملات المجهولة لنموذج فيزيائي، وتعلّم حدود الإغلاق للعمليات غير المحلولة، ونماذج الصندوق الرمادي. ستقارن في هذه الوحدة الأساليب الثلاثة مع تغيير كمية البيانات المتاحة لديك.",
+ "diagram": {
+  "title": "Patterns of hybrid modelling",
+  "caption": "Keep the physics where it is trusted; learn only the part it misses.",
+  "nodes": [
+   {
+    "id": "phy",
+    "label": "Physics model",
+    "sub": "Greenshields, IDM, LWR",
+    "x": 140,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "physics",
+    "detail": "A trusted but imperfect model: right structure, simplified details."
+   },
+   {
+    "id": "res",
+    "label": "Residual learning",
+    "sub": "y = physics + ML(x)",
+    "x": 450,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Learn the difference between data and physics. The most common and simplest hybrid."
+   },
+   {
+    "id": "par",
+    "label": "Parameter learning",
+    "sub": "ML predicts parameters",
+    "x": 450,
+    "y": 270,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "A network predicts physical parameters (e.g. capacity by weather and time), and the physics model runs with them."
+   },
+   {
+    "id": "clo",
+    "label": "Closure learning",
+    "sub": "ML for missing terms",
+    "x": 450,
+    "y": 430,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Learn terms the physics cannot resolve, inside the equation (e.g. lane-changing in a traffic model)."
+   },
+   {
+    "id": "dat",
+    "label": "Data",
+    "sub": "only where measured",
+    "x": 140,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "data",
+    "detail": "Sparse and limited to the conditions observed."
+   },
+   {
+    "id": "out",
+    "label": "Hybrid prediction",
+    "sub": "accurate + safe beyond data",
+    "x": 760,
+    "y": 270,
+    "w": 170,
+    "h": 64,
+    "sys": "system",
+    "detail": "Fits the data and falls back on the physics where data are missing."
+   }
+  ],
+  "edges": [
+   {
+    "from": "phy",
+    "to": "res",
+    "label": ""
+   },
+   {
+    "from": "dat",
+    "to": "res",
+    "label": "residuals"
+   },
+   {
+    "from": "phy",
+    "to": "par",
+    "label": ""
+   },
+   {
+    "from": "phy",
+    "to": "clo",
+    "label": ""
+   },
+   {
+    "from": "res",
+    "to": "out",
+    "label": ""
+   },
+   {
+    "from": "par",
+    "to": "out",
+    "label": ""
+   },
+   {
+    "from": "clo",
+    "to": "out",
+    "label": ""
+   }
+  ],
+  "tour": [
+   {
+    "focus": [
+     "phy",
+     "dat"
+    ],
+    "text": "Start with an imperfect physics model and some data."
+   },
+   {
+    "focus": [
+     "res"
+    ],
+    "text": "Residual learning: learn only the gap between them.",
+    "edges": [
+     [
+      "phy",
+      "res"
+     ],
+     [
+      "dat",
+      "res"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "par"
+    ],
+    "text": "Or let a network predict the physics model's parameters.",
+    "edges": [
+     [
+      "phy",
+      "par"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "clo"
+    ],
+    "text": "Or learn missing terms inside the equation.",
+    "edges": [
+     [
+      "phy",
+      "clo"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "out"
+    ],
+    "text": "All three keep the physics' good behaviour beyond the data.",
+    "edges": [
+     [
+      "res",
+      "out"
+     ],
+     [
+      "par",
+      "out"
+     ],
+     [
+      "clo",
+      "out"
+     ]
+    ]
+   }
+  ]
+ },
+ "sections": [
+  {
+   "heading": "Residual hybrids, step by step",
+   "html": "<p>(1) Fit or choose the physics model, here Greenshields v = v<sub>f</sub>(1 − ρ/ρ<sub>j</sub>). (2) Compute residuals r = v<sub>data</sub> − v<sub>physics</sub>. (3) Fit a small, regularised model to the residuals (here a quadratic). (4) Predict v = v<sub>physics</sub> + r̂. Keep the correction small and smooth; a huge learned correction means the physics is wrong, not just imperfect.</p>"
+  },
+  {
+   "heading": "Beyond the data",
+   "html": "<p>With 20 observations up to 60 veh/km, the errors at higher densities are: ML only (degree-4 polynomial) about 870 km/h, physics only about 13 km/h, hybrid about 3.6 km/h. With data up to 100 veh/km all improve, but the hybrid stays best. The explorer lets you see how quickly the ML-only model goes wrong once it leaves its data.</p>"
+  },
+  {
+   "heading": "Other hybrid patterns",
+   "html": "<p><b>Parameter learning</b>: a network predicts physical parameters from context (for example, capacity from weather and lighting), then the physics model runs. <b>Closure learning</b>: a network represents an unresolved term inside the equation, trained through the solver (universal differential equations). <b>Gray-box models</b> mix known and learned blocks in a system diagram. All keep interpretable structure.</p>"
+  },
+  {
+   "heading": "When to choose a hybrid",
+   "html": "<p>Choose a hybrid when the physics captures the main structure but misses details, data are limited, and extrapolation matters (new conditions, rare events). Avoid it if the physics is badly wrong (the correction will dominate) or if data are abundant and conditions never change (pure ML may be simpler).</p>"
+  }
+ ],
+ "callouts": [
+  {
+   "after": 1,
+   "kind": "try",
+   "title": "Try it",
+   "html": "<p>Set the highest observed density to 40, then to 120. How do the three errors change? Which model is most stable?</p>"
+  },
+  {
+   "after": 3,
+   "kind": "research",
+   "title": "Research angle",
+   "html": "<p>Hybrid car-following (IDM plus a learned residual) and hybrid traffic-flow models are active topics; see module 3.2.</p>"
+  }
+ ],
+ "explorer": {
+  "widget": "hybrid",
+  "intro": "Speed–density data are available only at low densities. Compare physics, ML and a hybrid beyond the data.",
+  "predict": "Which model will be worst at high density?"
+ },
+ "code": [
+  {
+   "title": "Physics, ML and hybrid beyond the data",
+   "lang": "python",
+   "file": "labs/go2/m27_hybrid.py",
+   "runnable": true,
+   "explain": "Fit each model to low-density data and score it at high density.",
+   "expected": "physics only                           error beyond the data:   12.6 km/h\nML only (degree-4 polynomial)          error beyond the data:  868.9 km/h\nhybrid: physics + learned correction   error beyond the data:    3.6 km/h"
+  }
+ ],
+ "takeaways": [
+  "A residual hybrid keeps the physics and learns only its error.",
+  "Hybrids need fewer data and extrapolate far more safely than pure ML.",
+  "Other patterns: parameter learning, closure learning, gray-box models.",
+  "Hybrids suit good-but-imperfect physics, limited data and extrapolation."
+ ],
+ "quiz": [
+  {
+   "q": "In a residual hybrid, the machine learning part models…",
+   "options": [
+    "The whole output",
+    "The difference between data and physics",
+    "The noise only",
+    "The inputs"
+   ],
+   "answer": 1,
+   "explain": "Learn the gap."
+  },
+  {
+   "q": "Beyond the data, a hybrid usually…",
+   "options": [
+    "Behaves like the physics model plus a small correction",
+    "Goes wild",
+    "Returns zero",
+    "Copies the last data point"
+   ],
+   "answer": 0,
+   "explain": "Falls back on physics."
+  },
+  {
+   "q": "Parameter learning means a network…",
+   "options": [
+    "Replaces the physics",
+    "Predicts the physics model's parameters from context",
+    "Learns the loss",
+    "Splits data"
+   ],
+   "answer": 1,
+   "explain": "Context → parameters."
+  },
+  {
+   "q": "A hybrid is a poor choice when…",
+   "options": [
+    "Physics is good but imperfect",
+    "The physics is badly wrong",
+    "Data are limited",
+    "Extrapolation matters"
+   ],
+   "answer": 1,
+   "explain": "The correction would dominate."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Hybrid model",
+   "def": "A model combining a physics-based component with a data-driven component."
+  },
+  {
+   "term": "Residual learning",
+   "def": "Learning the error of a physics model and adding it as a correction."
+  },
+  {
+   "term": "Closure term",
+   "def": "A term representing unresolved processes in a coarse model."
+  },
+  {
+   "term": "Gray-box model",
+   "def": "A model mixing known physical structure with learned components."
+  },
+  {
+   "term": "Greenshields model",
+   "def": "A linear speed–density relation for traffic, from 1935."
+  }
+ ],
+ "resources": [
+  {
+   "title": "Willard et al. (2022): Integrating scientific knowledge with machine learning",
+   "url": "https://doi.org/10.1145/3514228",
+   "why": "A survey of hybrid patterns."
+  },
+  {
+   "title": "Rackauckas et al. (2020): Universal differential equations",
+   "url": "https://arxiv.org/abs/2001.04385",
+   "why": "Closure learning inside equations."
+  },
+  {
+   "title": "Greenshields (1935): A study of traffic capacity",
+   "url": "https://onlinepubs.trb.org/Onlinepubs/hrbproceedings/14/14P1-024.pdf",
+   "why": "The original speed–density study."
+  }
+ ]
+}

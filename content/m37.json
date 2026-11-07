@@ -1,0 +1,328 @@
+{
+ "id": "3.7",
+ "go": 3,
+ "slug": "digital-twins-for-transport",
+ "title": "Digital twins for transport operations",
+ "minutes": 45,
+ "tag": "Twins",
+ "systems": [
+  "system",
+  "data"
+ ],
+ "summary": "A transport digital twin runs a model in step with live data: it estimates the current state, forecasts and tests actions safely. Data assimilation keeps it honest; physics carries it through sensor gaps.",
+ "outcomes": [
+  "define a transport digital twin and its components",
+  "explain data assimilation as predict-and-correct at system scale",
+  "show how a twin survives a sensor failure",
+  "describe uses for signals, motorways and resilience planning"
+ ],
+ "narration_en": "A digital twin is more than a simulation. It is a model of a real road, junction or city that is continuously corrected with live data, so that at any moment it represents the current state of the real system. Operators can then look into the near future: forecast queues in the next fifteen minutes, test a new signal plan or a diversion in the twin before applying it, and plan for emergencies. The core mechanism is data assimilation, the same predict-and-correct idea as the Kalman filter, applied to a whole traffic model. Our example is a signalised approach. The queue model alone has an arrival estimate that is fifteen percent too low, so it drifts far from reality, with an error of about twenty-eight vehicles. Corrected each cycle with a noisy detector, the twin tracks the real queue within about three vehicles. When the detector fails for twenty cycles, the model carries the twin through the gap and the error grows only modestly. Twins combine physics models, machine learning for forecasting and perception, and Physical AI for control. In this module you will tune a twin and break its detector.",
+ "narration_ar": "التوأم الرقمي أكثر من مجرد محاكاة. إنه نموذج لطريق أو تقاطع أو مدينة حقيقية يُصحَّح باستمرار بالبيانات الحية، فيمثل في كل لحظة الحالة الراهنة للنظام الحقيقي. ويستطيع المشغلون عندئذ النظر إلى المستقبل القريب: التنبؤ بالطوابير في الدقائق الخمس عشرة التالية، واختبار خطة إشارات جديدة أو تحويلة داخل التوأم قبل تطبيقها، والتخطيط لحالات الطوارئ. والآلية الجوهرية هي استيعاب البيانات، أي فكرة التنبؤ ثم التصحيح نفسها في مرشّح كالمان، مطبقةً على نموذج مروري كامل. ومثالنا مدخل تقاطع بإشارات. فنموذج الطابور وحده يقدّر الوصول أقل من الحقيقة بخمسة عشر بالمئة، فيبتعد كثيراً عن الواقع، بخطأ يقارب ثماني وعشرين مركبة. وحين يُصحَّح في كل دورة بكاشف مشوش، يتتبع التوأم الطابور الحقيقي بخطأ نحو ثلاث مركبات. وحين يتعطل الكاشف عشرين دورة، يحمل النموذج التوأم عبر الفجوة ولا يزداد الخطأ إلا بقدر معتدل. وتجمع التوائم بين النماذج الفيزيائية، وتعلم الآلة للتنبؤ والإدراك، والذكاء الاصطناعي المادي للتحكم. ستضبط في هذه الوحدة توأماً وتعطّل كاشفه.",
+ "diagram": {
+  "title": "A transport digital twin",
+  "caption": "Live data correct the model; the corrected model forecasts and tests actions; decisions change the real system.",
+  "nodes": [
+   {
+    "id": "real",
+    "label": "Real system",
+    "sub": "roads, signals, vehicles",
+    "x": 140,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "system",
+    "detail": "The physical network with its traffic, incidents and weather."
+   },
+   {
+    "id": "sens",
+    "label": "Live data",
+    "sub": "detectors, probes, cameras",
+    "x": 140,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "data",
+    "detail": "Streams of counts, speeds, trajectories and events; with noise, delays and failures."
+   },
+   {
+    "id": "mod",
+    "label": "Physics model",
+    "sub": "queue, LWR, simulation",
+    "x": 450,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "physics",
+    "detail": "Traffic-flow or queue model that predicts how the state evolves."
+   },
+   {
+    "id": "da",
+    "label": "Data assimilation",
+    "sub": "predict, then correct",
+    "x": 450,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Kalman-type correction keeps the model state close to observations."
+   },
+   {
+    "id": "fc",
+    "label": "Forecast and what-if",
+    "sub": "next 15 minutes, plans",
+    "x": 760,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "apply",
+    "detail": "Forecast queues and travel times; test signal plans or diversions safely in the twin."
+   },
+   {
+    "id": "act",
+    "label": "Decisions",
+    "sub": "signals, ramp meters, info",
+    "x": 760,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "apply",
+    "detail": "Approved actions are sent to the real system; their effects are measured again."
+   }
+  ],
+  "edges": [
+   {
+    "from": "real",
+    "to": "sens",
+    "label": "measured"
+   },
+   {
+    "from": "sens",
+    "to": "da",
+    "label": ""
+   },
+   {
+    "from": "mod",
+    "to": "da",
+    "label": "prediction"
+   },
+   {
+    "from": "da",
+    "to": "fc",
+    "label": "current state"
+   },
+   {
+    "from": "fc",
+    "to": "act",
+    "label": ""
+   },
+   {
+    "from": "act",
+    "to": "real",
+    "label": "changes"
+   }
+  ],
+  "tour": [
+   {
+    "focus": [
+     "real",
+     "sens"
+    ],
+    "text": "The real system is measured continuously.",
+    "edges": [
+     [
+      "real",
+      "sens"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "mod"
+    ],
+    "text": "A physics model predicts the next state."
+   },
+   {
+    "focus": [
+     "da"
+    ],
+    "text": "Data assimilation corrects the prediction with live data.",
+    "edges": [
+     [
+      "sens",
+      "da"
+     ],
+     [
+      "mod",
+      "da"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "fc"
+    ],
+    "text": "The twin forecasts and tests actions safely.",
+    "edges": [
+     [
+      "da",
+      "fc"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "act"
+    ],
+    "text": "Decisions return to the real system, closing the loop.",
+    "edges": [
+     [
+      "fc",
+      "act"
+     ],
+     [
+      "act",
+      "real"
+     ]
+    ]
+   }
+  ]
+ },
+ "sections": [
+  {
+   "heading": "What makes a twin",
+   "html": "<p>A digital twin needs (1) a model of the physical system, (2) live data, (3) a two-way link: data update the model, and the model informs actions on the system. Without live updating it is a simulation; without a link to decisions it is a dashboard. Transport twins range from one junction to whole cities (for example, digital twins built on traffic simulators such as SUMO or Aimsun with real-time feeds).</p>"
+  },
+  {
+   "heading": "Data assimilation in practice",
+   "html": "<p>Each cycle: predict the queue with the model, then correct towards the detector by a gain g. In the explorer: model alone, error ≈ 28 vehicles (it underestimates arrivals by 15%); twin with g = 0.5, ≈ 2.6 vehicles; three-cycle-ahead forecasts ≈ 9 vehicles. Too low a gain ignores data; too high follows detector noise. For large networks, ensemble Kalman filters and particle filters are used.</p>"
+  },
+  {
+   "heading": "Surviving sensor failures",
+   "html": "<p>When the detector fails for 20 cycles, the twin keeps running the model; the error grows from about 2.6 to about 8.5 vehicles, still far better than the uncorrected model. Physics-based structure is what makes this graceful degradation possible; a pure data model would have nothing to run on. Twins should flag reduced confidence during gaps.</p>"
+  },
+  {
+   "heading": "Uses and frontiers",
+   "html": "<p>Signal timing and corridor management; incident response and diversion testing; event and evacuation planning; resilience studies (floods, heat). Frontiers: learned surrogates (module 2.5) to make city-scale twins real-time, Physical AI controllers trained in twins (reinforcement learning) and transferred safely to the real world, and standards for twin validation.</p>"
+  }
+ ],
+ "callouts": [
+  {
+   "after": 1,
+   "kind": "try",
+   "title": "Try it",
+   "html": "<p>Set the gain to 0 (model only), then 1 (trust the detector fully) with noise 10. Which gives the best twin?</p>"
+  },
+  {
+   "after": 3,
+   "kind": "research",
+   "title": "Research angle",
+   "html": "<p>Open question: how should a city decide that a digital twin is good enough to test interventions? Validation standards for transport twins are still emerging.</p>"
+  }
+ ],
+ "explorer": {
+  "widget": "twin",
+  "intro": "A digital twin of a signalised approach: a queue model corrected each 90 s cycle with a detector.",
+  "predict": "When the detector fails, will the twin's error jump back to the model-alone level?"
+ },
+ "code": [
+  {
+   "title": "A queue digital twin with a detector failure",
+   "lang": "python",
+   "file": "labs/go3/m37_twin.py",
+   "runnable": true,
+   "explain": "Model alone, twin with assimilation, and twin through a 20-cycle detector failure.",
+   "expected": "gain 0.0, detector working: model alone  41.9 veh, twin  41.9 veh\ngain 0.5, detector working: model alone  41.9 veh, twin   3.6 veh\ngain 0.5, detector fails 20 cycles: model alone  41.9 veh, twin   7.8 veh"
+  }
+ ],
+ "takeaways": [
+  "A digital twin is a model kept in step with a real system by live data and linked to decisions.",
+  "Data assimilation predicts with physics and corrects with measurements.",
+  "Physics structure lets a twin degrade gracefully when sensors fail.",
+  "Twins support signals, incidents, events and resilience; learned surrogates make them faster."
+ ],
+ "quiz": [
+  {
+   "q": "What distinguishes a digital twin from a simulation?",
+   "options": [
+    "Better graphics",
+    "Continuous updating with live data and a link to decisions",
+    "More vehicles",
+    "Nothing"
+   ],
+   "answer": 1,
+   "explain": "Two-way link."
+  },
+  {
+   "q": "Data assimilation means…",
+   "options": [
+    "Deleting old data",
+    "Correcting a model's predictions with observations",
+    "Collecting more sensors",
+    "Training once"
+   ],
+   "answer": 1,
+   "explain": "Predict and correct."
+  },
+  {
+   "q": "When a detector fails, a physics-based twin…",
+   "options": [
+    "Stops",
+    "Keeps running its model with growing uncertainty",
+    "Becomes perfect",
+    "Uses random numbers"
+   ],
+   "answer": 1,
+   "explain": "Graceful degradation."
+  },
+  {
+   "q": "A twin can test a new signal plan…",
+   "options": [
+    "Only after applying it",
+    "Safely before applying it to the real junction",
+    "Never",
+    "Only at night"
+   ],
+   "answer": 1,
+   "explain": "What-if analysis."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Digital twin",
+   "def": "A model continuously updated with data from, and linked to decisions about, a real system."
+  },
+  {
+   "term": "Data assimilation",
+   "def": "Combining model predictions with observations to estimate a system's state."
+  },
+  {
+   "term": "Graceful degradation",
+   "def": "Continuing to work, with reduced accuracy, when parts fail."
+  },
+  {
+   "term": "Particle filter",
+   "def": "A data assimilation method using many weighted model samples."
+  },
+  {
+   "term": "What-if analysis",
+   "def": "Testing possible actions in a model before applying them."
+  }
+ ],
+ "resources": [
+  {
+   "title": "Kušić et al. (2023): A digital twin in transportation: real-time synergy of traffic data streams and simulation",
+   "url": "https://doi.org/10.1016/j.aei.2022.101858",
+   "why": "A motorway digital twin."
+  },
+  {
+   "title": "SUMO: Simulation of Urban Mobility",
+   "url": "https://eclipse.dev/sumo/",
+   "why": "Open-source traffic simulator used in many twins."
+  },
+  {
+   "title": "Transport Twin Study Path",
+   "url": "https://smrahmanbd.github.io/transport-twin-study/",
+   "why": "Our companion course on transport digital twins."
+  }
+ ]
+}

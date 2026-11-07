@@ -1,0 +1,314 @@
+{
+ "id": "2.6",
+ "go": 2,
+ "slug": "gaussian-processes-and-uq",
+ "title": "Gaussian processes and uncertainty",
+ "minutes": 45,
+ "tag": "Build",
+ "systems": [
+  "risk",
+  "learn"
+ ],
+ "summary": "A Gaussian process predicts a value and its uncertainty, widening its error bars far from data. Kernels encode smoothness; marginal likelihood tunes them; calibrated uncertainty is the goal.",
+ "outcomes": [
+  "explain a Gaussian process as a distribution over smooth functions",
+  "describe the role of the kernel and its length scale",
+  "check whether uncertainty bands are well calibrated",
+  "tune a length scale by maximum marginal likelihood"
+ ],
+ "narration_en": "A prediction without an error bar is half an answer. Gaussian processes give both. Think of a Gaussian process as a cloud of possible smooth curves. Before seeing data, the cloud is wide. Each observation pins the curves near that point, and the cloud narrows there. Between observations it stays narrow if they are close and widens if they are far apart. The kernel decides what the curves look like. The squared-exponential kernel says two inputs are similar if they are within about one length scale of each other. A short length scale gives wiggly curves that forget quickly; a long one gives smooth curves that can be overconfident. Instead of guessing, we choose the length scale that makes the data most probable, called maximising the marginal likelihood. The test of good uncertainty is calibration: a 95 percent band should contain the truth about 95 percent of the time. Gaussian processes are the workhorse for surrogates and emulators, Bayesian calibration of models, and deciding where to measure next. In this module you will tune a Gaussian process and check its calibration.",
+ "narration_ar": "التنبؤ بلا هامش خطأ نصف إجابة. والعمليات الغاوسية تعطي الأمرين معاً. تخيّل العملية الغاوسية سحابة من المنحنيات الملساء الممكنة. قبل رؤية البيانات تكون السحابة واسعة، وكل ملاحظة تثبّت المنحنيات قرب نقطتها فتضيق السحابة هناك. وبين الملاحظات تبقى ضيقة إذا كانت قريبة من بعضها، وتتسع إذا كانت متباعدة. ودالة النواة هي التي تحدد شكل المنحنيات. فنواة الأُس التربيعي تقول إن مدخلين متشابهان إذا كانا ضمن طول مقياس واحد تقريباً من بعضهما. طول المقياس القصير يعطي منحنيات متموجة سريعة النسيان، والطويل يعطي منحنيات ملساء قد تكون مفرطة الثقة. وبدلاً من التخمين نختار طول المقياس الذي يجعل البيانات أكثر احتمالاً، وهذا ما يسمى تعظيم الأرجحية الهامشية. واختبار جودة عدم اليقين هو المعايرة: يجب أن يحتوي نطاق الخمسة والتسعين بالمئة على القيمة الحقيقية نحو خمسة وتسعين بالمئة من الوقت. والعمليات الغاوسية هي الأداة الأساسية للنماذج البديلة والمحاكيات، والمعايرة البايزية للنماذج، وتحديد أين نقيس بعد ذلك. ستضبط في هذه الوحدة عملية غاوسية وتتحقق من معايرتها.",
+ "diagram": {
+  "title": "From prior to calibrated prediction",
+  "caption": "A kernel defines plausible curves; data narrow them; the length scale is tuned; calibration is checked.",
+  "nodes": [
+   {
+    "id": "pri",
+    "label": "Prior",
+    "sub": "cloud of smooth curves",
+    "x": 140,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Before data: a Gaussian process with mean zero and a kernel k(x, x′)."
+   },
+   {
+    "id": "ker",
+    "label": "Kernel",
+    "sub": "similarity, length scale ℓ",
+    "x": 140,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "physics",
+    "detail": "Squared exponential: k = σ² exp(−(x − x′)²/(2ℓ²)). ℓ sets how fast similarity fades. Kernels can encode physics (periodic, smooth, linear)."
+   },
+   {
+    "id": "obs",
+    "label": "Observations",
+    "sub": "with noise σₙ",
+    "x": 450,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "data",
+    "detail": "Each data point pins the curves near it, up to the noise level."
+   },
+   {
+    "id": "post",
+    "label": "Posterior",
+    "sub": "mean + band",
+    "x": 450,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "system",
+    "detail": "Closed-form formulas give the mean and variance at any x. Bands widen away from data."
+   },
+   {
+    "id": "ml",
+    "label": "Marginal likelihood",
+    "sub": "tune ℓ, σ",
+    "x": 760,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Pick hyperparameters that make the observed data most probable."
+   },
+   {
+    "id": "cal",
+    "label": "Calibration",
+    "sub": "95% band, 95% coverage",
+    "x": 760,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "Check on held-out data that bands contain the truth as often as claimed."
+   }
+  ],
+  "edges": [
+   {
+    "from": "pri",
+    "to": "post",
+    "label": ""
+   },
+   {
+    "from": "ker",
+    "to": "pri",
+    "label": "defines"
+   },
+   {
+    "from": "obs",
+    "to": "post",
+    "label": "conditions"
+   },
+   {
+    "from": "ml",
+    "to": "ker",
+    "label": "tunes"
+   },
+   {
+    "from": "post",
+    "to": "cal",
+    "label": "check"
+   }
+  ],
+  "tour": [
+   {
+    "focus": [
+     "pri",
+     "ker"
+    ],
+    "text": "A kernel defines which curves are plausible before data.",
+    "edges": [
+     [
+      "ker",
+      "pri"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "obs",
+     "post"
+    ],
+    "text": "Data pin the curves: the posterior mean and band.",
+    "edges": [
+     [
+      "pri",
+      "post"
+     ],
+     [
+      "obs",
+      "post"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "ml"
+    ],
+    "text": "Maximum likelihood tunes the length scale and noise.",
+    "edges": [
+     [
+      "ml",
+      "ker"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "cal"
+    ],
+    "text": "Finally check calibration: do 95% bands cover 95%?",
+    "edges": [
+     [
+      "post",
+      "cal"
+     ]
+    ]
+   }
+  ]
+ },
+ "sections": [
+  {
+   "heading": "A distribution over functions",
+   "html": "<p>A Gaussian process (GP) says any finite set of function values is jointly Gaussian, with covariance given by a kernel. Conditioning on data gives closed-form predictions:</p><div class=\"eq\">μ(x*) = k*ᵀ (K + σₙ² I)⁻¹ y,   σ²(x*) = k(x*, x*) − k*ᵀ (K + σₙ² I)⁻¹ k*</div><p>The variance does not depend on y: uncertainty shrinks wherever there are observations, whatever their values.</p>"
+  },
+  {
+   "heading": "Length scale and calibration",
+   "html": "<p>In the explorer with 8 observations: ℓ = 0.6 gives an error of about 0.35 with the truth inside the band almost everywhere; ℓ = 3 is far too smooth (error 1.0, band covers only 19% of the truth: overconfident); ℓ = 0.1 is wiggly and its band is wide almost everywhere (honest but less useful). Good uncertainty is both <b>calibrated</b> (covers as claimed) and <b>sharp</b> (as narrow as possible).</p>"
+  },
+  {
+   "heading": "Tuning by marginal likelihood",
+   "html": "<p>The log marginal likelihood, log p(y | ℓ, σ), balances data fit against complexity automatically. In the lab, scanning ℓ from 0.1 to 3 and picking the maximum gives ℓ ≈ 0.8. Libraries (scikit-learn GaussianProcessRegressor, GPyTorch) optimise it by gradient methods.</p>"
+  },
+  {
+   "heading": "Where GPs are used",
+   "html": "<p><b>Emulators</b> of slow simulators (module 3.5, GCAM); <b>Bayesian calibration</b> of model parameters with a model-discrepancy term (Kennedy and O'Hagan 2001); <b>Bayesian optimisation</b>, choosing the next experiment where improvement is likely; and spatial interpolation of sensor data (kriging). Their cost grows with the cube of the number of points, so sparse approximations are used beyond a few thousand points.</p>"
+  }
+ ],
+ "callouts": [
+  {
+   "after": 1,
+   "kind": "try",
+   "title": "Try it",
+   "html": "<p>With 6 observations, slide ℓ from 0.1 to 3. Watch the band coverage readout. Where is the band honest and still useful?</p>"
+  },
+  {
+   "after": 3,
+   "kind": "gcam",
+   "title": "GCAM link",
+   "html": "<p>A GP emulator of a GCAM output gives not only a fast answer but also the uncertainty that tells you where to spend your next GCAM run.</p>"
+  }
+ ],
+ "explorer": {
+  "widget": "gp",
+  "intro": "A Gaussian process predicts a curve and its 95% band from a few noisy observations.",
+  "predict": "What happens to the band far from any observation?"
+ },
+ "code": [
+  {
+   "title": "Gaussian process regression from scratch",
+   "lang": "python",
+   "file": "labs/go2/m26_gp.py",
+   "runnable": true,
+   "explain": "Cholesky-based GP prediction, calibration check and length-scale selection by marginal likelihood.",
+   "expected": "length scale 0.1: error 0.699, truth inside 95% band 100%, -log likelihood   2.50\nlength scale 0.6: error 0.542, truth inside 95% band 99%, -log likelihood  -1.43\nlength scale 3.0: error 0.799, truth inside 95% band 25%, -log likelihood   5.93\nlength scale chosen by maximum likelihood: 0.80"
+  }
+ ],
+ "takeaways": [
+  "A Gaussian process predicts a mean and an uncertainty band.",
+  "The kernel's length scale controls smoothness; bands widen away from data.",
+  "Tune hyperparameters by maximising the marginal likelihood.",
+  "Good uncertainty is calibrated and sharp; GPs power emulators and Bayesian calibration."
+ ],
+ "quiz": [
+  {
+   "q": "A Gaussian process's uncertainty is largest…",
+   "options": [
+    "At the observations",
+    "Far from any observation",
+    "At x = 0",
+    "Everywhere equal"
+   ],
+   "answer": 1,
+   "explain": "Bands widen away from data."
+  },
+  {
+   "q": "A very long length scale tends to make a GP…",
+   "options": [
+    "Wiggly",
+    "Overly smooth and possibly overconfident",
+    "Exactly right",
+    "Unstable"
+   ],
+   "answer": 1,
+   "explain": "It assumes far points are similar."
+  },
+  {
+   "q": "Calibration means a 95% band…",
+   "options": [
+    "Is narrow",
+    "Contains the truth about 95% of the time",
+    "Contains all data",
+    "Is 95 units wide"
+   ],
+   "answer": 1,
+   "explain": "Covers as claimed."
+  },
+  {
+   "q": "GP hyperparameters are commonly tuned by…",
+   "options": [
+    "Guessing",
+    "Maximising the marginal likelihood",
+    "Using the test set",
+    "Setting them to 1"
+   ],
+   "answer": 1,
+   "explain": "Let the data choose."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Gaussian process",
+   "def": "A distribution over functions in which any finite set of values is jointly Gaussian."
+  },
+  {
+   "term": "Kernel",
+   "def": "A function measuring similarity between inputs; it defines a GP's covariance."
+  },
+  {
+   "term": "Length scale",
+   "def": "The distance over which a kernel considers inputs similar."
+  },
+  {
+   "term": "Marginal likelihood",
+   "def": "The probability of the data given the hyperparameters, averaging over functions."
+  },
+  {
+   "term": "Calibration",
+   "def": "Agreement between stated and actual coverage of uncertainty intervals."
+  }
+ ],
+ "resources": [
+  {
+   "title": "Rasmussen and Williams (2006): Gaussian Processes for Machine Learning (free)",
+   "url": "http://gaussianprocess.org/gpml/",
+   "why": "The standard textbook."
+  },
+  {
+   "title": "Distill: A visual exploration of Gaussian processes",
+   "url": "https://distill.pub/2019/visual-exploration-gaussian-processes/",
+   "why": "Interactive introduction."
+  },
+  {
+   "title": "Kennedy and O'Hagan (2001)",
+   "url": "https://doi.org/10.1111/1467-9868.00294",
+   "why": "Bayesian calibration of computer models."
+  }
+ ]
+}

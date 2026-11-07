@@ -1,0 +1,331 @@
+{
+ "id": "3.8",
+ "go": 3,
+ "slug": "research-frontier-and-responsibility",
+ "title": "The research frontier and responsible SciML",
+ "minutes": 40,
+ "tag": "Research",
+ "systems": [
+  "apply",
+  "risk"
+ ],
+ "summary": "Open questions: foundation models for physical systems, rare events, verification of learned controllers and fairness. Report SciML results honestly, with baselines, uncertainty and limits.",
+ "outcomes": [
+  "name open research questions in Physical AI and SciML for transport",
+  "describe foundation models and world models for physical systems",
+  "apply a checklist for honest SciML reporting",
+  "discuss ethical and fairness issues in transport SciML"
+ ],
+ "narration_en": "You have now met the main tools of scientific machine learning and seen them at work in traffic, vehicles, safety, energy, climate models, crowds and digital twins. Many questions remain open. Can large foundation models, trained on huge collections of simulations and sensor data, learn general physical behaviour that transfers to new cities and new problems? Can learned world models simulate traffic well enough to train automated vehicles safely? How do we verify that a learned controller will never do something dangerous in a situation it has never seen? How do we model rare events, such as crashes, crushes and extreme weather, when data on them are almost absent? Who benefits and who is left out when models trained in one place are used in another? Answering these needs good research practice. Always compare against strong classical baselines and simple models. Report uncertainty, not just a single error. Test on conditions the model has not seen. State the limits clearly, and share code and data. In this module you will turn these ideas into a checklist for your own project.",
+ "narration_ar": "تعرّفت الآن على الأدوات الرئيسة لتعلم الآلة العلمي ورأيتها تعمل في المرور والمركبات والسلامة والطاقة ونماذج المناخ والحشود والتوائم الرقمية. لكن أسئلة كثيرة ما زالت مفتوحة. هل تستطيع النماذج التأسيسية الكبيرة، المدرّبة على مجموعات ضخمة من المحاكاة وبيانات أجهزة الاستشعار، تعلّم سلوك فيزيائي عام ينتقل إلى مدن جديدة ومسائل جديدة؟ وهل تستطيع نماذج العالم المتعلَّمة محاكاة المرور بجودة تكفي لتدريب المركبات الآلية بأمان؟ وكيف نتحقق من أن متحكماً متعلَّماً لن يفعل شيئاً خطيراً في موقف لم يره قط؟ وكيف ننمذج الأحداث النادرة، كالحوادث والتدافع والطقس المتطرف، حين تكاد البيانات عنها تنعدم؟ ومن المستفيد ومن المُستبعَد حين تُستخدم نماذج دُرّبت في مكان ما في مكان آخر؟ والإجابة عن هذه الأسئلة تتطلب ممارسة بحثية جيدة: قارن دائماً بمراجع كلاسيكية قوية ونماذج بسيطة، وأبلغ عن عدم اليقين لا عن خطأ واحد فقط، واختبر في ظروف لم يرها النموذج، واذكر الحدود بوضوح، وشارك الشيفرة والبيانات. ستحوّل في هذه الوحدة هذه الأفكار إلى قائمة تحقق لمشروعك الخاص.",
+ "diagram": {
+  "title": "Open questions and good practice",
+  "caption": "Five research fronts, and the reporting habits that make SciML results trustworthy.",
+  "nodes": [
+   {
+    "id": "fm",
+    "label": "Foundation models",
+    "sub": "pretrained on physics",
+    "x": 140,
+    "y": 90,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Large models pretrained on many simulations and sensors, fine-tuned for new tasks (e.g. weather foundation models)."
+   },
+   {
+    "id": "wm",
+    "label": "World models",
+    "sub": "learned simulators",
+    "x": 140,
+    "y": 260,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Generative models of traffic scenes used to train and test automated vehicles."
+   },
+   {
+    "id": "ver",
+    "label": "Verification",
+    "sub": "safe learned control",
+    "x": 140,
+    "y": 430,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "Proving learned controllers stay within safe limits, including unseen situations."
+   },
+   {
+    "id": "rare",
+    "label": "Rare events",
+    "sub": "crashes, crushes, extremes",
+    "x": 450,
+    "y": 430,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "Learning about what is almost never observed: physics, simulation and extreme value methods."
+   },
+   {
+    "id": "fair",
+    "label": "Fairness and transfer",
+    "sub": "who benefits?",
+    "x": 760,
+    "y": 430,
+    "w": 170,
+    "h": 64,
+    "sys": "apply",
+    "detail": "Models trained in rich, data-dense places may fail or harm elsewhere."
+   },
+   {
+    "id": "you",
+    "label": "Your study",
+    "sub": "question, data, physics",
+    "x": 450,
+    "y": 220,
+    "w": 170,
+    "h": 64,
+    "sys": "system",
+    "detail": "A research question that uses SciML for a transport problem."
+   },
+   {
+    "id": "rep",
+    "label": "Honest reporting",
+    "sub": "baselines, UQ, limits",
+    "x": 760,
+    "y": 220,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "Strong baselines, held-out tests, uncertainty, clear limits, open code and data."
+   }
+  ],
+  "edges": [
+   {
+    "from": "fm",
+    "to": "you",
+    "label": ""
+   },
+   {
+    "from": "wm",
+    "to": "you",
+    "label": ""
+   },
+   {
+    "from": "ver",
+    "to": "you",
+    "label": ""
+   },
+   {
+    "from": "rare",
+    "to": "you",
+    "label": ""
+   },
+   {
+    "from": "fair",
+    "to": "you",
+    "label": ""
+   },
+   {
+    "from": "you",
+    "to": "rep",
+    "label": "write up"
+   }
+  ],
+  "tour": [
+   {
+    "focus": [
+     "fm",
+     "wm"
+    ],
+    "text": "Two fronts: foundation models and learned world models."
+   },
+   {
+    "focus": [
+     "ver",
+     "rare"
+    ],
+    "text": "Two more: verifying learned control and learning about rare events."
+   },
+   {
+    "focus": [
+     "fair"
+    ],
+    "text": "And fairness: models must work for everyone they affect."
+   },
+   {
+    "focus": [
+     "you"
+    ],
+    "text": "Your study draws on these fronts.",
+    "edges": [
+     [
+      "fm",
+      "you"
+     ],
+     [
+      "wm",
+      "you"
+     ],
+     [
+      "ver",
+      "you"
+     ],
+     [
+      "rare",
+      "you"
+     ],
+     [
+      "fair",
+      "you"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "rep"
+    ],
+    "text": "Report it honestly.",
+    "edges": [
+     [
+      "you",
+      "rep"
+     ]
+    ]
+   }
+  ]
+ },
+ "sections": [
+  {
+   "heading": "Foundation and world models",
+   "html": "<p>Foundation models pretrained on huge amounts of physical data (for example, weather models such as GraphCast and Aurora) now rival traditional forecasting systems. In transport, open questions include pretrained traffic models that transfer between cities, and learned world models that generate realistic traffic scenes for training automated vehicles. Do they respect physics, and how do we know when they are wrong?</p>"
+  },
+  {
+   "heading": "Safety, rare events and verification",
+   "html": "<p>Learned controllers must be verified: reachability analysis, safety filters (control barrier functions) and runtime monitors that fall back to physics-based control. Rare events need simulation, physics constraints and extreme value methods, because data barely exist. Benchmarks with honest rare-event test sets are scarce and valuable.</p>"
+  },
+  {
+   "heading": "Fairness and transfer",
+   "html": "<p>Most training data come from a few well-instrumented countries and cities. Models may perform worse in places with different vehicles, road users, cultures or climates, including many cities in the Global South. Check performance by region and group, involve local stakeholders, and prefer physics-based structure that transfers better than pure correlations.</p>"
+  },
+  {
+   "heading": "A checklist for honest SciML",
+   "html": "<p>Before submitting: (1) a precise question and metric; (2) leakage-free splits; (3) strong classical and simple baselines; (4) physics consistency checks; (5) uncertainty with calibration evidence; (6) out-of-distribution tests; (7) ablations showing what the physics adds; (8) computational cost compared fairly; (9) limits and failure cases stated; (10) code, data and seeds shared. McGreivy and Hakim (2024) found weak baselines common in ML-for-PDE papers: do better.</p>"
+  }
+ ],
+ "callouts": [
+  {
+   "after": 3,
+   "kind": "trap",
+   "title": "Common trap",
+   "html": "<p>Claiming a PINN 'beats' a solver after tuning the PINN for weeks and the solver for minutes. Compare at equal effort, accuracy or cost.</p>"
+  },
+  {
+   "after": 1,
+   "kind": "research",
+   "title": "Pick your front",
+   "html": "<p>Choose one front for your project and say which open question you address, which data and physics you use, and how you will know if you are wrong.</p>"
+  }
+ ],
+ "code": [
+  {
+   "title": "Report a result with a baseline and an interval",
+   "lang": "python",
+   "runnable": true,
+   "source": "import numpy as np\nrng = np.random.default_rng(8)\n# errors (veh/km) of a baseline and a SciML estimator on 30 held-out days\nbase = rng.normal(5.7, 1.2, 30)\nsciml = base - rng.normal(4.4, 0.9, 30)\nd = base - sciml\nboot = [rng.choice(d, 30).mean() for _ in range(5000)]\nlo, hi = np.percentile(boot, [2.5, 97.5])\nprint(f'baseline {base.mean():.1f}, SciML {sciml.mean():.1f} veh/km')\nprint(f'improvement {d.mean():.1f} veh/km, 95% bootstrap interval {lo:.1f} to {hi:.1f}; better on {np.mean(d > 0):.0%} of days')",
+   "explain": "Compare paired errors against a baseline and report a bootstrap interval, not a single number.",
+   "expected": "baseline 5.6, SciML 1.3 veh/km\nimprovement 4.3 veh/km, 95% bootstrap interval 3.9 to 4.7; better on 100% of days"
+  }
+ ],
+ "takeaways": [
+  "Open fronts: foundation and world models, verification, rare events, fairness and transfer.",
+  "Learned controllers need safety filters, monitors and physics fallbacks.",
+  "Check performance across regions and groups; physics structure transfers better.",
+  "Use the ten-point checklist: baselines, UQ, ablations, limits and open code."
+ ],
+ "quiz": [
+  {
+   "q": "A learned world model is…",
+   "options": [
+    "A globe",
+    "A generative model of scenes used to train and test systems",
+    "A map app",
+    "A survey"
+   ],
+   "answer": 1,
+   "explain": "Learned simulator."
+  },
+  {
+   "q": "A safety filter for a learned controller…",
+   "options": [
+    "Removes the controller",
+    "Overrides actions that would break safety constraints",
+    "Adds noise",
+    "Speeds it up"
+   ],
+   "answer": 1,
+   "explain": "Barrier functions."
+  },
+  {
+   "q": "Why check model performance by region?",
+   "options": [
+    "It is required by PyTorch",
+    "Models trained in data-rich places may fail elsewhere",
+    "Regions have equal data",
+    "It improves training speed"
+   ],
+   "answer": 1,
+   "explain": "Fairness and transfer."
+  },
+  {
+   "q": "An ablation study shows…",
+   "options": [
+    "Model size",
+    "What each component, such as the physics term, contributes",
+    "Training time",
+    "Data volume"
+   ],
+   "answer": 1,
+   "explain": "Remove parts and compare."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Foundation model",
+   "def": "A large model pretrained on broad data and adapted to many tasks."
+  },
+  {
+   "term": "World model",
+   "def": "A learned model that simulates how an environment evolves."
+  },
+  {
+   "term": "Safety filter",
+   "def": "A mechanism that modifies a controller's actions to keep the system safe."
+  },
+  {
+   "term": "Ablation study",
+   "def": "Removing parts of a model to measure their contribution."
+  },
+  {
+   "term": "Out-of-distribution test",
+   "def": "Evaluation on conditions unlike the training data."
+  }
+ ],
+ "resources": [
+  {
+   "title": "Lam et al. (2023): GraphCast",
+   "url": "https://doi.org/10.1126/science.adi2336",
+   "why": "A machine-learning weather model rivalling traditional forecasts."
+  },
+  {
+   "title": "McGreivy and Hakim (2024): Weak baselines and reporting biases in ML for fluid-related PDEs",
+   "url": "https://doi.org/10.1038/s42256-024-00897-5",
+   "why": "Why strong baselines matter."
+  },
+  {
+   "title": "Di and Shi (2021): A survey on autonomous vehicle control in the era of mixed-autonomy",
+   "url": "https://doi.org/10.1016/j.trc.2021.103008",
+   "why": "Physical AI on the road."
+  }
+ ]
+}

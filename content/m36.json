@@ -1,0 +1,329 @@
+{
+ "id": "3.6",
+ "go": 3,
+ "slug": "crowd-dynamics-with-sciml",
+ "title": "Crowd dynamics with scientific machine learning",
+ "minutes": 45,
+ "tag": "Crowds",
+ "systems": [
+  "risk",
+  "physics"
+ ],
+ "summary": "Crowd data are plentiful at comfortable densities and scarce at dangerous ones. Physics-shaped models, learned force parameters and physics-informed networks make crowd predictions trustworthy where it matters.",
+ "outcomes": [
+  "explain why crowd models must extrapolate to dangerous densities",
+  "fit a physics-shaped fundamental diagram and compare it with a free curve",
+  "describe how SciML learns social-force or route-choice parameters from trajectories",
+  "outline physics-informed crowd monitoring and its ethics"
+ ],
+ "narration_en": "At mass gatherings, from stadiums to the Hajj, crowd safety depends on predicting what happens at high densities. Yet most measurements come from comfortable conditions, because dangerous densities are rare and hard to measure. This is exactly the setting where pure data fits fail. Suppose we measure walking speed at densities up to two and a half persons per square metre and fit a flexible cubic curve. At five persons per square metre, the cubic predicts people walking faster than at low density, which is physically absurd. A physics-shaped law, such as Weidmann's fundamental diagram, where speed falls to zero at a jam density, needs only its three parameters fitted, and extrapolates almost perfectly. The same idea scales up: learning the parameters of social-force or other pedestrian models from trajectory data, physics-informed networks for crowd density fields, and hybrid route-choice models. Physical AI enters too, through camera-based crowd counting and real-time digital twins of event spaces, which raise privacy questions. In this module you will see a free curve fail where a physics-shaped one succeeds.",
+ "narration_ar": "في التجمعات الحاشدة، من الملاعب إلى الحج، تعتمد سلامة الحشود على التنبؤ بما يحدث عند الكثافات العالية. ومع ذلك تأتي معظم القياسات من ظروف مريحة، لأن الكثافات الخطرة نادرة ويصعب قياسها. وهذا تحديداً هو الموقف الذي تخفق فيه المطابقات البحتة للبيانات. لنفترض أننا قسنا سرعة المشي عند كثافات تصل إلى شخصين ونصف لكل متر مربع، وطابقنا منحنى تكعيبياً مرناً. عند خمسة أشخاص لكل متر مربع يتنبأ المنحنى التكعيبي بأن الناس يمشون أسرع مما يمشون عند الكثافة المنخفضة، وهذا عبث فيزيائي. أما القانون ذو الشكل الفيزيائي، كالمخطط الأساسي لفايدمان، الذي تنخفض فيه السرعة إلى الصفر عند كثافة الانسداد، فلا يحتاج إلا إلى مطابقة معاملاته الثلاثة، ويستقرئ بدقة شبه تامة. والفكرة نفسها تتسع: تعلّم معاملات نموذج القوى الاجتماعية أو غيره من نماذج المشاة من بيانات المسارات، وشبكات مستنيرة بالفيزياء لحقول كثافة الحشود، ونماذج هجينة لاختيار المسار. ويدخل الذكاء الاصطناعي المادي أيضاً عبر عدّ الحشود بالكاميرات والتوائم الرقمية الآنية لأماكن الفعاليات، وهي تثير أسئلة الخصوصية. ستشاهد في هذه الوحدة منحنى حراً يخفق حيث ينجح منحنى ذو شكل فيزيائي.",
+ "diagram": {
+  "title": "SciML for crowd safety",
+  "caption": "Data from comfortable densities, physics for dangerous ones, and monitoring that respects people.",
+  "nodes": [
+   {
+    "id": "traj",
+    "label": "Trajectory data",
+    "sub": "experiments, video",
+    "x": 140,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "data",
+    "detail": "Controlled experiments (e.g. Jülich), video-derived tracks, counts. Mostly at moderate densities."
+   },
+   {
+    "id": "fd",
+    "label": "Physics-shaped laws",
+    "sub": "Weidmann, Fruin",
+    "x": 450,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "physics",
+    "detail": "Fundamental diagrams with speed → 0 at jam density; levels of service. Few parameters, safe extrapolation."
+   },
+   {
+    "id": "sfm",
+    "label": "Learned model parameters",
+    "sub": "social force, CA, routes",
+    "x": 760,
+    "y": 110,
+    "w": 200,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Fit social-force strengths, desired speeds and route-choice weights to trajectories; or learn residual forces with networks."
+   },
+   {
+    "id": "pinn",
+    "label": "Physics-informed density fields",
+    "sub": "conservation + data",
+    "x": 760,
+    "y": 330,
+    "w": 210,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Networks for density and velocity constrained by pedestrian continuity equations."
+   },
+   {
+    "id": "mon",
+    "label": "Monitoring",
+    "sub": "counting, pressure maps",
+    "x": 450,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "apply",
+    "detail": "Camera-based crowd counting and crowd pressure maps for control rooms."
+   },
+   {
+    "id": "eth",
+    "label": "Privacy and ethics",
+    "sub": "aggregate, anonymise",
+    "x": 140,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "Use aggregate densities, avoid identifying individuals, document purpose and retention."
+   }
+  ],
+  "edges": [
+   {
+    "from": "traj",
+    "to": "fd",
+    "label": "calibrate"
+   },
+   {
+    "from": "traj",
+    "to": "sfm",
+    "label": "fit"
+   },
+   {
+    "from": "fd",
+    "to": "pinn",
+    "label": "constrains"
+   },
+   {
+    "from": "sfm",
+    "to": "pinn",
+    "label": ""
+   },
+   {
+    "from": "pinn",
+    "to": "mon",
+    "label": ""
+   },
+   {
+    "from": "eth",
+    "to": "mon",
+    "label": "governs",
+    "sys": "risk"
+   }
+  ],
+  "tour": [
+   {
+    "focus": [
+     "traj"
+    ],
+    "text": "Data come mostly from comfortable densities."
+   },
+   {
+    "focus": [
+     "fd"
+    ],
+    "text": "Physics-shaped laws extrapolate safely to dangerous densities.",
+    "edges": [
+     [
+      "traj",
+      "fd"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "sfm"
+    ],
+    "text": "Pedestrian model parameters can be learned from trajectories.",
+    "edges": [
+     [
+      "traj",
+      "sfm"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "pinn",
+     "mon"
+    ],
+    "text": "Physics-informed fields support real-time monitoring.",
+    "edges": [
+     [
+      "fd",
+      "pinn"
+     ],
+     [
+      "sfm",
+      "pinn"
+     ],
+     [
+      "pinn",
+      "mon"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "eth"
+    ],
+    "text": "Monitoring must respect privacy.",
+    "edges": [
+     [
+      "eth",
+      "mon"
+     ]
+    ]
+   }
+  ]
+ },
+ "sections": [
+  {
+   "heading": "Extrapolating to danger",
+   "html": "<p>Weidmann (1993): v(ρ) = v₀ (1 − exp(−γ (1/ρ − 1/ρ<sub>max</sub>))), with v₀ = 1.34 m/s, γ = 1.913, ρ<sub>max</sub> = 5.4 persons/m². In the explorer, with data only up to 2.5 persons/m², a cubic fit is off by about 2.6 m/s beyond the data (it predicts people speeding up at high density), while fitting only Weidmann's three parameters is off by about 0.01 m/s. With data only up to 1.5 persons/m², the cubic error exceeds 15 m/s; the physics-shaped fit stays near 0.015.</p>"
+  },
+  {
+   "heading": "Learning pedestrian models",
+   "html": "<p>Social-force and similar models have parameters (desired speed, interaction strength and range, relaxation time) that vary by culture, purpose and setting. SciML calibrates them from trajectories by minimising simulated-versus-observed differences, or learns residual interaction forces with neural networks while keeping the physical structure (Kreiss et al. on social LSTMs; physics-informed hybrids). Equation discovery (module 2.4) has been used to find pedestrian interaction laws from data.</p>"
+  },
+  {
+   "heading": "Monitoring with Physical AI",
+   "html": "<p>Crowd-counting networks estimate density maps from camera images; optical flow gives velocities; crowd pressure (density × velocity variance, Helbing et al. 2007) flags turbulence. Physics-informed post-processing enforces conservation between camera views. Digital twins of venues combine these with simulation to forecast density minutes ahead. Our Crowd Dynamics course covers the crowd science in depth.</p>"
+  },
+  {
+   "heading": "Ethics",
+   "html": "<p>Crowd monitoring must protect privacy: use aggregate density and flow rather than identities, process video on site, minimise retention, and be transparent about purpose. Models trained on one culture or venue may not transfer; validate locally, and never let a model replace trained stewards and clear authority to act.</p>"
+  }
+ ],
+ "callouts": [
+  {
+   "after": 1,
+   "kind": "try",
+   "title": "Try it",
+   "html": "<p>Lower the highest observed density to 1.5 persons/m². What does the cubic predict at 5 persons/m²? Does the physics-shaped fit change much?</p>"
+  },
+  {
+   "after": 2,
+   "kind": "research",
+   "title": "Research angle",
+   "html": "<p>See our Crowd Dynamics in three goes course for mass-gathering crowd science; SciML adds learned parameters and physics-informed monitoring on top.</p>"
+  }
+ ],
+ "explorer": {
+  "widget": "crowdfit",
+  "intro": "Walking-speed data exist only for light crowds. Compare a free cubic curve with a physics-shaped law at dangerous densities.",
+  "predict": "What will the cubic curve predict at 5 persons per m²?"
+ },
+ "code": [
+  {
+   "title": "Physics-shaped versus free fit for crowds",
+   "lang": "python",
+   "file": "labs/go3/m36_crowd.py",
+   "runnable": true,
+   "explain": "Grid-search Weidmann's three parameters versus fitting a cubic, on light-crowd data only.",
+   "expected": "fitted v0 = 1.40 m/s, gamma = 1.65, rho_max = 5.7 per m2\nerror at 2.6-5.4 per m2: cubic 1.66 m/s, physics-shaped 0.012 m/s\ncubic predicts 2.71 m/s at 5 per m2 (true 0.04)"
+  }
+ ],
+ "takeaways": [
+  "Crowd data are plentiful at safe densities and scarce at dangerous ones.",
+  "Physics-shaped laws such as Weidmann's extrapolate safely; free curves do not.",
+  "SciML calibrates and corrects pedestrian models from trajectory data.",
+  "Camera-based monitoring needs physics checks and strong privacy safeguards."
+ ],
+ "quiz": [
+  {
+   "q": "Why must crowd models extrapolate?",
+   "options": [
+    "Data at dangerous densities are scarce",
+    "Crowds never change",
+    "Cameras are perfect",
+    "Physics is unknown"
+   ],
+   "answer": 0,
+   "explain": "Danger is where data are missing."
+  },
+  {
+   "q": "At high density, an unconstrained cubic fitted to light-crowd data may predict…",
+   "options": [
+    "Zero speed",
+    "Physically absurd speeds, even speeding up",
+    "The exact truth",
+    "No output"
+   ],
+   "answer": 1,
+   "explain": "Free curves wander."
+  },
+  {
+   "q": "Fitting Weidmann's law means estimating…",
+   "options": [
+    "Hundreds of weights",
+    "Three parameters: v₀, γ and ρ_max",
+    "Only the mean speed",
+    "Camera angles"
+   ],
+   "answer": 1,
+   "explain": "Few physical parameters."
+  },
+  {
+   "q": "A privacy-respecting crowd monitor should…",
+   "options": [
+    "Identify every person",
+    "Use aggregate densities and minimise retention",
+    "Share video publicly",
+    "Avoid validation"
+   ],
+   "answer": 1,
+   "explain": "Aggregate, not identify."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Fundamental diagram (crowds)",
+   "def": "The relation between pedestrian density, speed and flow."
+  },
+  {
+   "term": "Weidmann's law",
+   "def": "A widely used pedestrian speed–density relation with three parameters."
+  },
+  {
+   "term": "Social force model",
+   "def": "A pedestrian model in which people respond to attractive and repulsive forces."
+  },
+  {
+   "term": "Crowd counting",
+   "def": "Estimating the number or density of people from images."
+  },
+  {
+   "term": "Crowd pressure",
+   "def": "Density times velocity variance; an indicator of crowd turbulence."
+  }
+ ],
+ "resources": [
+  {
+   "title": "Weidmann (1993): Transporttechnik der Fussgänger",
+   "url": "https://doi.org/10.3929/ethz-a-000687810",
+   "why": "Source of the pedestrian fundamental diagram."
+  },
+  {
+   "title": "Helbing, Johansson and Al-Abideen (2007): Dynamics of crowd disasters",
+   "url": "https://doi.org/10.1103/PhysRevE.75.046109",
+   "why": "Crowd pressure and turbulence at the Hajj."
+  },
+  {
+   "title": "Crowd Dynamics in three goes",
+   "url": "https://smrahmanbd.github.io/Crowd-Dynamics-Learning/",
+   "why": "Our companion course on crowd science."
+  }
+ ]
+}

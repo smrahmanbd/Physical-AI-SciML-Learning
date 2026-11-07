@@ -1,0 +1,329 @@
+{
+ "id": "3.5",
+ "go": 3,
+ "slug": "gcam-and-iam-emulators",
+ "title": "GCAM and integrated assessment emulators",
+ "minutes": 50,
+ "tag": "Climate",
+ "systems": [
+  "system",
+  "learn"
+ ],
+ "summary": "Integrated assessment models such as GCAM link energy, land, water, economy and climate, but each run is slow. Emulators trained on a few runs make thousands of policy scenarios and uncertainty studies possible.",
+ "outcomes": [
+  "describe what GCAM represents and why its runs are expensive",
+  "build a Gaussian process emulator of a GCAM-like transport output",
+  "use emulator uncertainty to choose the next full-model run (active learning)",
+  "discuss the limits of emulators for policy analysis"
+ ],
+ "narration_en": "Integrated assessment models, or IAMs, such as GCAM, the Global Change Analysis Model developed at the Pacific Northwest National Laboratory, represent how energy, agriculture and land, water, the economy and the climate interact across the world's regions until the end of the century. They answer questions such as: what carbon price would cut transport emissions by half by 2050, and what would it do to electricity demand and land use? Each scenario can take hours to run, yet policy questions need thousands of runs to explore combinations of carbon prices, technology costs and behaviour, and to quantify uncertainty. Emulators make this feasible. We run GCAM at a carefully chosen set of inputs, train a fast statistical model, often a Gaussian process, on the outputs, and use it for everything else. The emulator's uncertainty tells us where it is unsure, so we run GCAM next exactly there: this is active learning. In our toy example, five well-placed runs already give an emulator error near one percent. In this module you will decide how many runs to buy, and where.",
+ "narration_ar": "تمثّل نماذج التقييم المتكامل، مثل GCAM، أي نموذج تحليل التغير العالمي الذي طوّره مختبر شمال غرب المحيط الهادئ الوطني، كيفية تفاعل الطاقة والزراعة واستخدام الأراضي والمياه والاقتصاد والمناخ عبر أقاليم العالم حتى نهاية القرن. وهي تجيب عن أسئلة مثل: ما سعر الكربون الذي يخفض انبعاثات النقل إلى النصف بحلول عام 2050، وما أثره في الطلب على الكهرباء واستخدام الأراضي؟ وقد يستغرق تشغيل السيناريو الواحد ساعات، بينما تحتاج أسئلة السياسات إلى آلاف التشغيلات لاستكشاف تركيبات أسعار الكربون وتكاليف التقنيات والسلوك، ولتقدير عدم اليقين. والمحاكيات تجعل هذا ممكناً: نشغّل GCAM عند مجموعة مدخلات مختارة بعناية، وندرّب نموذجاً إحصائياً سريعاً، غالباً عملية غاوسية، على مخرجاته، ونستخدمه لكل ما عدا ذلك. ويخبرنا عدم يقين المحاكي أين يكون غير متأكد، فنشغّل GCAM بعد ذلك هناك تحديداً، وهذا هو التعلم النشط. وفي مثالنا التعليمي تعطي خمسة تشغيلات موزعة جيداً محاكياً بخطأ يقارب واحداً بالمئة. ستقرر في هذه الوحدة كم تشغيلاً ستشتري، وأين.",
+ "diagram": {
+  "title": "Emulating an integrated assessment model",
+  "caption": "A few expensive GCAM runs train an emulator; its uncertainty chooses the next run; policy questions are answered at emulator speed.",
+  "nodes": [
+   {
+    "id": "gcam",
+    "label": "GCAM",
+    "sub": "energy, land, water, economy, climate",
+    "x": 140,
+    "y": 110,
+    "w": 210,
+    "h": 64,
+    "sys": "system",
+    "detail": "A global, regional, market-equilibrium model run in 5-year steps to 2100 (Calvin et al. 2019). Hours per scenario."
+   },
+   {
+    "id": "des",
+    "label": "Design of runs",
+    "sub": "carbon price, tech costs",
+    "x": 140,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "data",
+    "detail": "Choose input combinations: space-filling designs over policy and technology parameters."
+   },
+   {
+    "id": "out",
+    "label": "Outputs",
+    "sub": "transport CO₂, energy use",
+    "x": 450,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "data",
+    "detail": "Quantities of interest, e.g. transport CO₂ in 2050, electricity demand, land use."
+   },
+   {
+    "id": "emu",
+    "label": "Emulator",
+    "sub": "Gaussian process",
+    "x": 450,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Fast statistical stand-in with uncertainty; neural networks for many outputs."
+   },
+   {
+    "id": "al",
+    "label": "Active learning",
+    "sub": "run where unsure",
+    "x": 760,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "Choose the next GCAM run where emulator uncertainty is largest."
+   },
+   {
+    "id": "pol",
+    "label": "Policy analysis",
+    "sub": "thousands of scenarios",
+    "x": 760,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "apply",
+    "detail": "Explore policy space, sensitivity, uncertainty and robust strategies at emulator speed."
+   }
+  ],
+  "edges": [
+   {
+    "from": "des",
+    "to": "gcam",
+    "label": "run"
+   },
+   {
+    "from": "gcam",
+    "to": "out",
+    "label": ""
+   },
+   {
+    "from": "out",
+    "to": "emu",
+    "label": "train"
+   },
+   {
+    "from": "emu",
+    "to": "pol",
+    "label": "fast"
+   },
+   {
+    "from": "emu",
+    "to": "al",
+    "label": ""
+   },
+   {
+    "from": "al",
+    "to": "des",
+    "label": "next run",
+    "sys": "risk"
+   }
+  ],
+  "tour": [
+   {
+    "focus": [
+     "gcam"
+    ],
+    "text": "GCAM couples energy, land, water, economy and climate, but runs slowly."
+   },
+   {
+    "focus": [
+     "des",
+     "out"
+    ],
+    "text": "Run it at a few carefully chosen inputs.",
+    "edges": [
+     [
+      "des",
+      "gcam"
+     ],
+     [
+      "gcam",
+      "out"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "emu"
+    ],
+    "text": "Train a fast emulator on the results.",
+    "edges": [
+     [
+      "out",
+      "emu"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "al"
+    ],
+    "text": "Its uncertainty shows where to run GCAM next.",
+    "edges": [
+     [
+      "emu",
+      "al"
+     ],
+     [
+      "al",
+      "des"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "pol"
+    ],
+    "text": "Then explore thousands of policy scenarios quickly.",
+    "edges": [
+     [
+      "emu",
+      "pol"
+     ]
+    ]
+   }
+  ]
+ },
+ "sections": [
+  {
+   "heading": "What GCAM represents",
+   "html": "<p>GCAM (Calvin et al. 2019) is an open-source integrated assessment model with 32 energy-economy regions, hundreds of land and water units, and detailed technology choices in buildings, industry and transport. Markets clear every five years; emissions feed a simple climate model. Its transport sector represents passenger and freight modes and vehicle technologies, competing on cost through logit choice. Because everything is linked, a carbon price changes vehicle choices, electricity generation and land use at once.</p>"
+  },
+  {
+   "heading": "Building the emulator",
+   "html": "<p>Pick an output, here transport CO₂ in 2050 versus carbon price. Run the full model at a few prices, fit a Gaussian process (module 2.6) and check it on extra runs. In the explorer: 3 evenly spread runs give an error of about 0.08 Gt; 5 runs about 0.013 Gt (around 1%); 5 runs bunched at low prices about 0.2 Gt, because the high-price region is unexplored.</p>"
+  },
+  {
+   "heading": "Active learning",
+   "html": "<p>Start with three runs, then repeatedly run the full model where the emulator's uncertainty is largest. In the lab the error falls from 0.085 Gt (3 runs) to about 0.01 Gt (7 runs), with each new run placed automatically in the least-known region. With many inputs (carbon price, battery cost, biofuel availability, behaviour), space-filling designs and dimension reduction are needed first.</p>"
+  },
+  {
+   "heading": "Limits and good practice",
+   "html": "<p>An emulator is only as good as the model it copies: it inherits GCAM's assumptions and cannot correct structural errors. It is valid only inside the sampled input ranges. Multi-output emulators must keep physical consistency (shares summing to one, emissions consistent with energy). Report emulator uncertainty alongside model uncertainty, and validate on held-out full runs. Published GCAM emulators and 'fast IAM' surrogates are an active research area.</p>"
+  }
+ ],
+ "callouts": [
+  {
+   "after": 1,
+   "kind": "gcam",
+   "title": "GCAM link",
+   "html": "<p>Our GCAM-Learning course explains GCAM's components and how to run them. This module shows how SciML makes GCAM studies faster.</p>"
+  },
+  {
+   "after": 2,
+   "kind": "try",
+   "title": "Try it",
+   "html": "<p>With 4 runs, compare evenly spread and clustered designs. Where is the uncertainty band widest in each case?</p>"
+  }
+ ],
+ "explorer": {
+  "widget": "emulator",
+  "intro": "Each full model run takes 6 hours (illustrative). Build an emulator of transport CO₂ in 2050 versus carbon price.",
+  "predict": "Will 5 runs bunched at low prices be as good as 5 spread runs?"
+ },
+ "code": [
+  {
+   "title": "A GP emulator with active learning",
+   "lang": "python",
+   "file": "labs/go3/m35_emulator.py",
+   "runnable": true,
+   "explain": "Start with three runs; add each new run where the emulator is most uncertain.",
+   "expected": "3 runs: emulator error 0.0845 Gt, largest uncertainty at 300 $/t\n4 runs: emulator error 0.0768 Gt, largest uncertainty at 95 $/t\n5 runs: emulator error 0.0125 Gt, largest uncertainty at 354 $/t\n6 runs: emulator error 0.0126 Gt, largest uncertainty at 43 $/t\n7 runs: emulator error 0.0104 Gt, largest uncertainty at 152 $/t"
+  }
+ ],
+ "takeaways": [
+  "GCAM links energy, land, water, economy and climate across regions, but runs are slow.",
+  "A Gaussian process emulator trained on a few runs answers thousands of policy questions.",
+  "Active learning places new runs where the emulator is least certain.",
+  "Emulators inherit the model's assumptions and are valid only inside sampled ranges."
+ ],
+ "quiz": [
+  {
+   "q": "GCAM is…",
+   "options": [
+    "A traffic simulator",
+    "An integrated assessment model linking energy, land, water, economy and climate",
+    "A crash database",
+    "A GPS service"
+   ],
+   "answer": 1,
+   "explain": "Global Change Analysis Model."
+  },
+  {
+   "q": "Why emulate GCAM?",
+   "options": [
+    "It is inaccurate",
+    "Each run is slow, and policy studies need many runs",
+    "It has no outputs",
+    "Emulators replace data"
+   ],
+   "answer": 1,
+   "explain": "Speed for many scenarios."
+  },
+  {
+   "q": "Active learning chooses the next full run…",
+   "options": [
+    "At random",
+    "Where the emulator is most uncertain",
+    "At zero carbon price",
+    "Where it is most certain"
+   ],
+   "answer": 1,
+   "explain": "Learn where unsure."
+  },
+  {
+   "q": "An emulator can correct GCAM's structural errors.",
+   "options": [
+    "True",
+    "False, it inherits them",
+    "Only with more runs",
+    "Only for transport"
+   ],
+   "answer": 1,
+   "explain": "A copy, not the truth."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Integrated assessment model (IAM)",
+   "def": "A model linking energy, economy, land use and climate to evaluate policies."
+  },
+  {
+   "term": "GCAM",
+   "def": "The Global Change Analysis Model, an open-source IAM from PNNL's Joint Global Change Research Institute."
+  },
+  {
+   "term": "Emulator",
+   "def": "A fast statistical approximation of a slow simulation model."
+  },
+  {
+   "term": "Active learning",
+   "def": "Choosing new model runs where an emulator is most uncertain."
+  },
+  {
+   "term": "Carbon price",
+   "def": "A charge per tonne of CO₂ emitted, used in scenarios to drive emission reductions."
+  }
+ ],
+ "resources": [
+  {
+   "title": "Calvin et al. (2019): GCAM v5.1",
+   "url": "https://doi.org/10.5194/gmd-12-677-2019",
+   "why": "The model description paper."
+  },
+  {
+   "title": "GCAM documentation",
+   "url": "https://jgcri.github.io/gcam-doc/",
+   "why": "Official documentation."
+  },
+  {
+   "title": "GCAM-Learning",
+   "url": "https://smrahmanbd.github.io/GCAM-Learning/",
+   "why": "Our companion course on GCAM in three goes."
+  }
+ ]
+}

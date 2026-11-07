@@ -1,0 +1,337 @@
+{
+ "id": "2.5",
+ "go": 2,
+ "slug": "operator-learning",
+ "title": "Operator learning: DeepONet and neural operators",
+ "minutes": 50,
+ "tag": "Build",
+ "systems": [
+  "learn",
+  "physics"
+ ],
+ "summary": "An operator maps a whole input function to a whole output function. Once trained on example pairs, a neural operator solves new cases of a PDE in milliseconds, across many inputs at once.",
+ "outcomes": [
+  "explain the difference between learning a function and learning an operator",
+  "describe the branch–trunk structure of DeepONet and the idea of Fourier neural operators",
+  "show why the number and variety of training pairs matter",
+  "train a small DeepONet in PyTorch"
+ ],
+ "narration_en": "A PINN solves one problem: one set of boundary conditions, one source, one parameter value. Change the input and you must train again. Operator learning removes that limitation. An operator is a map from a whole function to a whole function: from a heat source pattern to the temperature field it creates, or from a traffic demand profile to the resulting congestion pattern. We generate example pairs with a classical solver, then train a neural operator to reproduce the map. Afterwards, new inputs are solved almost instantly. DeepONet, by Lu and colleagues, uses two networks: a branch network reads the input function at sensor points, a trunk network reads the location where we want the answer, and their dot product gives the output. Fourier neural operators, by Li and colleagues, learn in frequency space and can work at different grid resolutions. The catch: the training inputs must cover the kinds of inputs you will meet later. In this module you will learn a solution operator from a few example pairs, and see exactly how many you need.",
+ "narration_ar": "الشبكة المستنيرة بالفيزياء تحل مسألة واحدة: مجموعة واحدة من الشروط الحدية، ومصدراً واحداً، وقيمة واحدة للمعامل. وإذا غيّرت المدخل وجب التدريب من جديد. ويزيل تعلم المؤثرات هذا القيد. فالمؤثر تحويل من دالة كاملة إلى دالة كاملة: من نمط مصدر حراري إلى حقل الحرارة الذي يولده، أو من منحنى طلب مروري إلى نمط الازدحام الناتج. نولّد أزواجاً من الأمثلة بمُحلّ كلاسيكي، ثم ندرّب مؤثراً عصبياً على إعادة إنتاج هذا التحويل، وبعدها تُحل المدخلات الجديدة فوراً تقريباً. وتستخدم شبكة DeepONet، التي قدمها لو وزملاؤه، شبكتين: شبكة فرعية تقرأ دالة المدخل عند نقاط استشعار، وشبكة جذعية تقرأ الموضع الذي نريد الإجابة عنده، ويعطي حاصل ضربهما النقطي المخرج. أما مؤثرات فورييه العصبية، التي قدمها لي وزملاؤه، فتتعلم في فضاء الترددات ويمكنها العمل بدقات شبكية مختلفة. لكن ثمة شرطاً: يجب أن تغطي مدخلات التدريب أنواع المدخلات التي ستواجهها لاحقاً. ستتعلم في هذه الوحدة مؤثر حل من أزواج أمثلة قليلة، وترى بالضبط كم تحتاج منها.",
+ "diagram": {
+  "title": "Learning a solution operator",
+  "caption": "A classical solver makes example pairs; a neural operator learns the map; new inputs are solved instantly.",
+  "nodes": [
+   {
+    "id": "f",
+    "label": "Input function f(x)",
+    "sub": "source, demand, coefficient",
+    "x": 140,
+    "y": 110,
+    "w": 200,
+    "h": 64,
+    "sys": "data",
+    "detail": "A whole function: a heat source, a demand profile, a road's capacity along its length."
+   },
+   {
+    "id": "sol",
+    "label": "Classical solver",
+    "sub": "makes training pairs",
+    "x": 140,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "physics",
+    "detail": "Solve the PDE for many random inputs to build a data set of (f, u) pairs. Expensive, but done once."
+   },
+   {
+    "id": "br",
+    "label": "Branch net",
+    "sub": "reads f at sensors",
+    "x": 450,
+    "y": 110,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Encodes the input function sampled at m fixed sensor points into p numbers."
+   },
+   {
+    "id": "tr",
+    "label": "Trunk net",
+    "sub": "reads location x",
+    "x": 450,
+    "y": 330,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Encodes the query location into p numbers."
+   },
+   {
+    "id": "u",
+    "label": "Output u(x)",
+    "sub": "branch · trunk",
+    "x": 760,
+    "y": 220,
+    "w": 170,
+    "h": 64,
+    "sys": "system",
+    "detail": "DeepONet output: dot product of branch and trunk vectors. Any x can be queried."
+   },
+   {
+    "id": "cov",
+    "label": "Coverage of inputs",
+    "sub": "train like you test",
+    "x": 450,
+    "y": 460,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "If new inputs look unlike the training inputs, predictions can be badly wrong."
+   }
+  ],
+  "edges": [
+   {
+    "from": "f",
+    "to": "sol",
+    "label": ""
+   },
+   {
+    "from": "sol",
+    "to": "br",
+    "label": "pairs"
+   },
+   {
+    "from": "f",
+    "to": "br",
+    "label": ""
+   },
+   {
+    "from": "tr",
+    "to": "u",
+    "label": ""
+   },
+   {
+    "from": "br",
+    "to": "u",
+    "label": "dot product"
+   },
+   {
+    "from": "cov",
+    "to": "br",
+    "label": "limits",
+    "sys": "risk"
+   }
+  ],
+  "tour": [
+   {
+    "focus": [
+     "f",
+     "sol"
+    ],
+    "text": "Generate many input functions and solve each with a classical solver.",
+    "edges": [
+     [
+      "f",
+      "sol"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "br"
+    ],
+    "text": "The branch net encodes the input function.",
+    "edges": [
+     [
+      "f",
+      "br"
+     ],
+     [
+      "sol",
+      "br"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "tr"
+    ],
+    "text": "The trunk net encodes where we want the answer."
+   },
+   {
+    "focus": [
+     "u"
+    ],
+    "text": "Their dot product gives the solution at that point.",
+    "edges": [
+     [
+      "br",
+      "u"
+     ],
+     [
+      "tr",
+      "u"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "cov"
+    ],
+    "text": "It only works for inputs like those seen in training.",
+    "edges": [
+     [
+      "cov",
+      "br"
+     ]
+    ]
+   }
+  ]
+ },
+ "sections": [
+  {
+   "heading": "Functions versus operators",
+   "html": "<p>A network usually learns a <b>function</b>: numbers in, numbers out. An <b>operator</b> takes a function in and gives a function out: G: f ↦ u. For −u″ = f with u(0) = u(1) = 0, G is the solution operator of the Poisson problem. Learning G means one trained model solves the problem for <i>every</i> source f, not just one.</p>"
+  },
+  {
+   "heading": "How many examples?",
+   "html": "<p>In the explorer the inputs are built from 8 sine shapes, so the operator restricted to them has 8 degrees of freedom. With 2 or 4 training pairs the error on new inputs is over 100%; with 8 or more it drops to essentially zero. Real input families are richer, so neural operators often need hundreds to thousands of pairs; the variety of the pairs matters as much as their number.</p>"
+  },
+  {
+   "heading": "DeepONet and Fourier neural operators",
+   "html": "<p><b>DeepONet</b> (Lu et al. 2021): u(x) ≈ Σ<sub>k</sub> b<sub>k</sub>(f) t<sub>k</sub>(x), branch b, trunk t. The PyTorch lab trains one on 500 pairs in about 10 seconds and reaches about 3% error on new inputs. <b>Fourier neural operators</b> (Li et al. 2021) apply learned filters in frequency space; they are resolution-independent and excel at fluid-like problems. Both can be made physics-informed by adding residual terms (PI-DeepONet).</p>"
+  },
+  {
+   "heading": "Transport uses",
+   "html": "<p>Operator learning can map demand profiles to congestion patterns along a corridor, weather fields to road-surface temperature, or emissions maps to concentration fields, giving fast surrogates for scenario studies and real-time control. The training data come from validated simulators, so their limits carry over.</p>"
+  }
+ ],
+ "callouts": [
+  {
+   "after": 1,
+   "kind": "try",
+   "title": "Try it",
+   "html": "<p>Increase training pairs from 1 to 10. At which number does the error collapse? Does adding more grid points change that number?</p>"
+  },
+  {
+   "after": 2,
+   "kind": "model",
+   "title": "Lab note",
+   "html": "<p>The browser lab learns a linear operator with ridge regression, the simplest operator learner. The PyTorch lab trains a real DeepONet on the same problem.</p>"
+  }
+ ],
+ "explorer": {
+  "widget": "operator",
+  "intro": "Learn the map from a heat source f(x) to the temperature u(x) from example pairs, then test on a new source.",
+  "predict": "How many training pairs will you need, given that inputs are built from 8 shapes?"
+ },
+ "code": [
+  {
+   "title": "Learning a linear solution operator",
+   "lang": "python",
+   "file": "labs/go2/m25_operator.py",
+   "runnable": true,
+   "explain": "A classical solver makes pairs; ridge regression learns the operator matrix.",
+   "expected": "2 training pairs: relative error on new inputs 1.194\n 4 training pairs: relative error on new inputs 1.780\n 8 training pairs: relative error on new inputs 0.000\n12 training pairs: relative error on new inputs 0.000"
+  },
+  {
+   "title": "A small DeepONet (PyTorch)",
+   "lang": "python",
+   "file": "labs/go2/m25_deeponet_torch.py",
+   "runnable": false,
+   "explain": "Branch and trunk networks trained on 500 pairs. Requires pip install torch; about 10 seconds.",
+   "expected": "iteration 4000: loss 5.90e-04\nrelative error on 100 new inputs: 0.027"
+  }
+ ],
+ "takeaways": [
+  "An operator maps whole functions to whole functions.",
+  "Neural operators are trained on pairs from a classical solver, then solve new inputs instantly.",
+  "DeepONet uses branch and trunk networks; Fourier neural operators learn in frequency space.",
+  "Training inputs must cover the inputs you will meet later."
+ ],
+ "quiz": [
+  {
+   "q": "An operator maps…",
+   "options": [
+    "A number to a number",
+    "A function to a function",
+    "A word to a word",
+    "An image to a label"
+   ],
+   "answer": 1,
+   "explain": "Function in, function out."
+  },
+  {
+   "q": "In DeepONet, the trunk network takes…",
+   "options": [
+    "The input function",
+    "The query location",
+    "The loss",
+    "The time step"
+   ],
+   "answer": 1,
+   "explain": "Branch: function; trunk: location."
+  },
+  {
+   "q": "Where do operator-learning training pairs usually come from?",
+   "options": [
+    "Random guesses",
+    "A classical solver run on many inputs",
+    "The test set",
+    "A survey"
+   ],
+   "answer": 1,
+   "explain": "Solver-generated pairs."
+  },
+  {
+   "q": "A neural operator may fail when…",
+   "options": [
+    "Inputs resemble the training inputs",
+    "New inputs are unlike any training input",
+    "The grid is fine",
+    "It is trained longer"
+   ],
+   "answer": 1,
+   "explain": "Coverage matters."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Operator",
+   "def": "A mapping from one function to another, such as from a PDE's source to its solution."
+  },
+  {
+   "term": "DeepONet",
+   "def": "A neural operator with a branch network for the input function and a trunk network for the query location."
+  },
+  {
+   "term": "Fourier neural operator",
+   "def": "A neural operator that applies learned filters in Fourier (frequency) space."
+  },
+  {
+   "term": "Solution operator",
+   "def": "The map from a problem's inputs to its solution."
+  },
+  {
+   "term": "Resolution independence",
+   "def": "The ability to evaluate on grids different from those used in training."
+  }
+ ],
+ "resources": [
+  {
+   "title": "Lu et al. (2021): Learning nonlinear operators via DeepONet",
+   "url": "https://doi.org/10.1038/s42256-021-00302-5",
+   "why": "The DeepONet paper."
+  },
+  {
+   "title": "Li et al. (2021): Fourier neural operator for parametric PDEs",
+   "url": "https://arxiv.org/abs/2010.08895",
+   "why": "The FNO paper."
+  },
+  {
+   "title": "Kovachki et al. (2023): Neural operator: learning maps between function spaces",
+   "url": "https://www.jmlr.org/papers/v24/21-1524.html",
+   "why": "A comprehensive review."
+  }
+ ]
+}

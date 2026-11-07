@@ -1,0 +1,348 @@
+{
+ "id": "3.1",
+ "go": 3,
+ "slug": "traffic-state-estimation",
+ "title": "Physics-informed traffic state estimation",
+ "minutes": 50,
+ "tag": "Traffic",
+ "systems": [
+  "physics",
+  "data"
+ ],
+ "summary": "Detectors see traffic at a few points; operators need it everywhere. Combining the LWR traffic-flow model with sparse detector data reconstructs jams and shock waves that interpolation misses.",
+ "outcomes": [
+  "state the traffic state estimation problem and its data sources",
+  "explain why interpolation fails at shock waves",
+  "combine the LWR model with detector data by nudging and by physics-informed deep learning",
+  "design a study comparing estimators fairly"
+ ],
+ "narration_en": "Traffic managers need to know density and speed along every kilometre of a road, every minute. But loop detectors sit hundreds of metres or kilometres apart, and probe vehicles give scattered samples. Filling the gaps is called traffic state estimation. The simplest approach draws straight lines between detectors, but traffic is not smooth: a jam has a sharp front, a shock wave, that moves upstream. Straight lines blur it or miss it entirely. Physics can help. The LWR model says vehicles are conserved and that flow depends on density through the fundamental diagram, so jams propagate as waves at predictable speeds. A physics-informed estimator runs this model and keeps correcting it towards the detector readings, like the Kalman filter from Go 1. Physics-informed deep learning, as in work by Shi, Mo, Di and colleagues, does the same with a neural network whose loss includes the LWR residual. In our ten kilometre ring road with two detectors, interpolation is off by about eleven vehicles per kilometre, and the physics-informed estimate by under two. In this module you will choose how many detectors to install and how much to trust them.",
+ "narration_ar": "يحتاج مديرو المرور إلى معرفة الكثافة والسرعة على كل كيلومتر من الطريق وفي كل دقيقة. لكن الكواشف الحلقية متباعدة مئات الأمتار أو كيلومترات، والمركبات المسبارية تعطي عينات متناثرة. ويسمى ملء هذه الفجوات تقدير حالة المرور. وأبسط طريقة هي رسم خطوط مستقيمة بين الكواشف، لكن المرور ليس أملس: فللاختناق جبهة حادة، أي موجة صدمية، تتحرك عكس اتجاه السير. والخطوط المستقيمة تطمسها أو تفوّتها كلياً. وهنا تساعد الفيزياء. فنموذج LWR يقول إن المركبات محفوظة وإن التدفق يعتمد على الكثافة عبر المخطط الأساسي، فتنتشر الاختناقات موجاتٍ بسرعات يمكن التنبؤ بها. والمقدِّر المستنير بالفيزياء يشغّل هذا النموذج ويستمر في تصحيحه نحو قراءات الكواشف، كمرشّح كالمان في المرحلة الأولى. ويفعل التعلم العميق المستنير بالفيزياء، كما في أعمال شي ومو ودي وزملائهم، الشيء نفسه بشبكة عصبية تتضمن دالة خسارتها بقية نموذج LWR. وفي طريقنا الدائري بطول عشرة كيلومترات وبكاشفين فقط، يخطئ الاستكمال بنحو إحدى عشرة مركبة لكل كيلومتر، ويخطئ التقدير المستنير بالفيزياء بأقل من اثنتين. ستختار في هذه الوحدة عدد الكواشف التي ستركّبها ومقدار ثقتك بها.",
+ "diagram": {
+  "title": "Estimating traffic everywhere from data somewhere",
+  "caption": "Sparse detectors and probes plus a traffic-flow model give a full space–time picture of the road.",
+  "nodes": [
+   {
+    "id": "det",
+    "label": "Loop detectors",
+    "sub": "flow, speed at points",
+    "x": 140,
+    "y": 90,
+    "w": 170,
+    "h": 64,
+    "sys": "data",
+    "detail": "Fixed sensors, typically 0.5 to 2 km apart on motorways; noisy and sometimes broken."
+   },
+   {
+    "id": "prb",
+    "label": "Probe vehicles",
+    "sub": "GPS traces, connected cars",
+    "x": 140,
+    "y": 270,
+    "w": 170,
+    "h": 64,
+    "sys": "data",
+    "detail": "Scattered samples along the road from phones, fleets and connected vehicles."
+   },
+   {
+    "id": "lwr",
+    "label": "LWR model",
+    "sub": "∂ρ/∂t + ∂q(ρ)/∂x = 0",
+    "x": 450,
+    "y": 90,
+    "w": 190,
+    "h": 64,
+    "sys": "physics",
+    "detail": "Conservation of vehicles plus a fundamental diagram q(ρ). Jams travel as shock waves."
+   },
+   {
+    "id": "fus",
+    "label": "Data fusion",
+    "sub": "nudging, Kalman, PIDL",
+    "x": 450,
+    "y": 270,
+    "w": 170,
+    "h": 64,
+    "sys": "learn",
+    "detail": "Correct the model towards data (nudging, Kalman filters) or train a network with LWR residuals (physics-informed deep learning)."
+   },
+   {
+    "id": "map",
+    "label": "Space–time map",
+    "sub": "density everywhere",
+    "x": 760,
+    "y": 180,
+    "w": 170,
+    "h": 64,
+    "sys": "system",
+    "detail": "A full picture of density, speed and flow along the road over time."
+   },
+   {
+    "id": "use",
+    "label": "Operations",
+    "sub": "ramp metering, alerts",
+    "x": 760,
+    "y": 380,
+    "w": 170,
+    "h": 64,
+    "sys": "apply",
+    "detail": "Feeds control (ramp metering, variable speed limits), traveller information and incident detection."
+   },
+   {
+    "id": "int",
+    "label": "Interpolation",
+    "sub": "straight lines",
+    "x": 450,
+    "y": 440,
+    "w": 170,
+    "h": 64,
+    "sys": "risk",
+    "detail": "Ignores physics; blurs or misses shock waves between detectors."
+   }
+  ],
+  "edges": [
+   {
+    "from": "det",
+    "to": "fus",
+    "label": ""
+   },
+   {
+    "from": "prb",
+    "to": "fus",
+    "label": ""
+   },
+   {
+    "from": "lwr",
+    "to": "fus",
+    "label": "physics"
+   },
+   {
+    "from": "fus",
+    "to": "map",
+    "label": ""
+   },
+   {
+    "from": "map",
+    "to": "use",
+    "label": ""
+   },
+   {
+    "from": "det",
+    "to": "int",
+    "label": "or"
+   },
+   {
+    "from": "int",
+    "to": "map",
+    "label": "blurred",
+    "sys": "risk"
+   }
+  ],
+  "tour": [
+   {
+    "focus": [
+     "det",
+     "prb"
+    ],
+    "text": "Data arrive from fixed detectors and moving probes."
+   },
+   {
+    "focus": [
+     "lwr"
+    ],
+    "text": "The LWR model knows that vehicles are conserved and jams move as waves."
+   },
+   {
+    "focus": [
+     "fus"
+    ],
+    "text": "Fusion combines both: the model fills gaps, the data keep it honest.",
+    "edges": [
+     [
+      "det",
+      "fus"
+     ],
+     [
+      "prb",
+      "fus"
+     ],
+     [
+      "lwr",
+      "fus"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "map",
+     "use"
+    ],
+    "text": "The result is a full space–time map for operations.",
+    "edges": [
+     [
+      "fus",
+      "map"
+     ],
+     [
+      "map",
+      "use"
+     ]
+    ]
+   },
+   {
+    "focus": [
+     "int"
+    ],
+    "text": "Interpolation alone blurs the jams.",
+    "edges": [
+     [
+      "det",
+      "int"
+     ],
+     [
+      "int",
+      "map"
+     ]
+    ]
+   }
+  ]
+ },
+ "sections": [
+  {
+   "heading": "The estimation problem",
+   "html": "<p>Unknown: density ρ(x, t) along the road. Known: noisy observations at detector positions and probe locations, and a traffic model with uncertain parameters (free-flow speed, jam density, capacity). Goal: the best estimate of ρ everywhere, with uncertainty, in real time. This is a classic inverse problem, and an ideal test case for SciML (Seo et al. 2017 review).</p>"
+  },
+  {
+   "heading": "Model-based fusion",
+   "html": "<p>Run the LWR model (Godunov / cell transmission scheme, module 2.3) and at each step pull the cells near detectors towards the readings: ρ ← ρ + g (z − ρ). In the explorer after 10 minutes on a 10 km ring road with a jam: with 2 detectors, interpolation error ≈ 11.4 veh/km versus ≈ 1.9 for the physics-informed estimate; with 5 detectors, ≈ 5.7 versus ≈ 1.1. The model carries information about the jam between detectors. The Kalman filter (and its ensemble version, EnKF) chooses the gain g optimally.</p>"
+  },
+  {
+   "heading": "Physics-informed deep learning",
+   "html": "<p>Physics-informed deep learning (PIDL) trains a network ρ<sub>θ</sub>(x, t) with loss = data misfit at sensors + λ × LWR residual at collocation points, sometimes also learning the fundamental diagram with a second network (Shi et al. 2021). Strengths: flexible, can learn unknown parameters, no grid. Weaknesses: shock waves are hard for smooth networks; training can be slow for real-time use. Hybrid approaches use the network offline and a filter online.</p>"
+  },
+  {
+   "heading": "Designing a fair study",
+   "html": "<p>Use a ground truth (high-resolution trajectories such as NGSIM or highD, or a microsimulation), hold out some detectors for testing, compare against interpolation and a Kalman-filter baseline, report errors in congested and free-flow conditions separately, and test robustness to detector failure and parameter error.</p>"
+  }
+ ],
+ "callouts": [
+  {
+   "after": 1,
+   "kind": "try",
+   "title": "Try it",
+   "html": "<p>Set the gain to 0: the physics model alone never learns about the jam. Raise it slowly. Is more trust in detectors always better?</p>"
+  },
+  {
+   "after": 3,
+   "kind": "research",
+   "title": "Research angle",
+   "html": "<p>Open question: how few detectors are needed if physics is used well? This has direct consequences for sensor investment budgets.</p>"
+  }
+ ],
+ "explorer": {
+  "widget": "trafficpinn",
+  "intro": "A jam forms on a 10 km ring road. Estimate density everywhere from a few detectors.",
+  "predict": "With only two detectors, which estimate will locate the jam better?"
+ },
+ "code": [
+  {
+   "title": "LWR + detectors versus interpolation",
+   "lang": "python",
+   "file": "labs/go3/m31_traffic_estimation.py",
+   "runnable": true,
+   "explain": "Godunov scheme for LWR, nudged towards noisy detector readings, compared with circular interpolation.",
+   "expected": "2 detectors: interpolation error  11.4 veh/km, physics-informed estimate  1.8 veh/km\n 4 detectors: interpolation error   3.9 veh/km, physics-informed estimate  1.0 veh/km\n10 detectors: interpolation error   2.9 veh/km, physics-informed estimate  1.2 veh/km"
+  }
+ ],
+ "takeaways": [
+  "Traffic state estimation fills gaps between sparse detectors and probes.",
+  "Interpolation misses shock waves; the LWR model carries them between sensors.",
+  "Model-based fusion (nudging, Kalman filters) and PIDL combine physics and data.",
+  "Fair studies need ground truth, held-out sensors and congested-condition errors."
+ ],
+ "quiz": [
+  {
+   "q": "Why does interpolation between detectors miss jams?",
+   "options": [
+    "Detectors are too accurate",
+    "Jams have sharp moving fronts that straight lines blur",
+    "Interpolation is too slow",
+    "It uses physics"
+   ],
+   "answer": 1,
+   "explain": "Shock waves."
+  },
+  {
+   "q": "In model-based fusion, the model is…",
+   "options": [
+    "Ignored",
+    "Corrected towards detector readings at each step",
+    "Replaced by data",
+    "Run once at the start"
+   ],
+   "answer": 1,
+   "explain": "Predict and correct."
+  },
+  {
+   "q": "PIDL for traffic adds to the loss…",
+   "options": [
+    "The LWR residual",
+    "A random term",
+    "Only detector data",
+    "Nothing"
+   ],
+   "answer": 0,
+   "explain": "Physics term."
+  },
+  {
+   "q": "A fair test of an estimator should…",
+   "options": [
+    "Use all detectors for fitting",
+    "Hold out detectors and report congested-condition errors",
+    "Only use free-flow data",
+    "Skip baselines"
+   ],
+   "answer": 1,
+   "explain": "Honest evaluation."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Traffic state estimation",
+   "def": "Inferring density, speed and flow everywhere on a road from sparse data."
+  },
+  {
+   "term": "Shock wave",
+   "def": "A sharp, moving boundary between traffic states, such as the back of a jam."
+  },
+  {
+   "term": "Nudging",
+   "def": "Pulling a model's state towards observations at each time step."
+  },
+  {
+   "term": "Physics-informed deep learning (PIDL)",
+   "def": "Training networks with physics residuals in the loss, here for traffic."
+  },
+  {
+   "term": "Ensemble Kalman filter",
+   "def": "A Kalman filter variant using an ensemble of model runs for nonlinear systems."
+  }
+ ],
+ "resources": [
+  {
+   "title": "Seo et al. (2017): Traffic state estimation on highway: a comprehensive survey",
+   "url": "https://doi.org/10.1016/j.arcontrol.2017.03.005",
+   "why": "The standard review."
+  },
+  {
+   "title": "Shi, Mo and Di (2021): Physics-informed deep learning for traffic state estimation",
+   "url": "https://doi.org/10.1609/aaai.v35i1.16120",
+   "why": "PIDL with a learned fundamental diagram."
+  },
+  {
+   "title": "highD dataset",
+   "url": "https://levelxdata.com/highd-dataset/",
+   "why": "Drone-recorded vehicle trajectories for ground truth."
+  }
+ ]
+}
